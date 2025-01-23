@@ -29,22 +29,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Inicio',
+          title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="credit"
-        options={{
-          title: 'Credito',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="credit-card.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Resumen',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="insights.fill" color={color} />,
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+        }}
+      />
+            <Tabs.Screen
+        name="credit"
+        options={{
+          title: 'Credito',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="credit-card.fill" color={color} />,
         }}
       />
     </Tabs>
