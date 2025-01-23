@@ -123,6 +123,7 @@ export default function Credit() {
 
 <Text style={{fontSize: 12, color: 'white', fontFamily: 'Regular'}}>Excelente</Text>
 
+
       </View>
     </View>
         </View>
