@@ -7,6 +7,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { PieChart } from "react-native-gifted-charts";
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 export default function Credit() {
 
@@ -91,13 +93,13 @@ export default function Credit() {
             <Text style={{ fontFamily: 'Medium', fontSize: 18 }} >ENERO 2025</Text>
             <Text style={styles.subtitle}>Buenos días Ricardo</Text>
 
-            <View
-      style={{
-        margin: 10,
-        padding: 10,
-        borderRadius: 20,
-        backgroundColor: '#232B5D',
-      }}>
+                          <LinearGradient
+                          colors={['#4c669f', '#3b5998', '#192f6a']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.graphcard}
+                          >
+                        <Text style={{fontSize: 16, color: 'white', fontFamily: 'Bold'}}>Citibanamex Clasica</Text>
 
       <View style={{padding: 5, alignItems: 'center'}}>
         <PieChart
@@ -111,6 +113,7 @@ export default function Credit() {
           centerLabelComponent={() => {
             return (
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        
                 <Text
                   style={{fontSize: 22, color: 'white', fontFamily: 'Regular'}}>
                   47%
@@ -120,14 +123,19 @@ export default function Credit() {
             );
           }}
         />
-
-<Text style={{fontSize: 12, color: 'white', fontFamily: 'Regular'}}>Excelente</Text>
-
-
       </View>
-    </View>
-        </View>
 
+        <Text style={{ fontSize: 14, color: 'white', fontFamily: 'Light' }}>
+        Uso Total: 
+        <Text style={{ fontFamily: 'Bold' }}> $2,500.00</Text>
+        </Text>
+        <Text style={{ fontSize: 14, color: 'white', fontFamily: 'Light' }}>
+        Limite: 
+        <Text style={{ fontFamily: 'Bold' }}> $11,580.00</Text>
+        </Text>
+
+      </LinearGradient>
+        </View>
     </View>
   );
 }
@@ -164,4 +172,10 @@ const styles = StyleSheet.create({
         color: '#0C3B35',
         fontFamily: "Medium", 
       },
+      graphcard: {
+        margin: 10,
+        padding: 10,
+        borderRadius: 20,
+        backgroundColor: '#232B5D',
+      }
 });
