@@ -23,6 +23,7 @@ const cardsData = [
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
+
       {/* Background Card */}
       <View style={styles.backcard} />
 
@@ -31,8 +32,10 @@ export default function HomeScreen() {
         <Text style={{ fontFamily: 'Medium', fontSize: 18 }} >ENERO 2025</Text>
         <Text style={styles.subtitle}>Buenos días Ricardo</Text>
       </View>
+      
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        
 
       {/* Expense Section */}
       <View style={styles.expenseSection}>
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: height * 0.35,
+    height: height * 0.30,
     backgroundColor: '#EDD2FC',
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
@@ -203,12 +206,12 @@ const styles = StyleSheet.create({
   },
   expenseText: {
     fontSize: 24,
-    fontFamily: "Regular",
+    fontFamily: "Bold",
     color: '#0D2653',
   },
   debtText: {
     fontSize: 24,
-    fontFamily: "Regular",
+    fontFamily: "Bold",
     color: '#00368C',
   },
   progressBarContainer: {
