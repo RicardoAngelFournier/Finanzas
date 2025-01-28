@@ -13,14 +13,17 @@ import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { BlurView } from 'expo-blur';
+import { useRouter } from "expo-router";
 
 const cardsData = [
-  { id: '1', type: 'VISA', balance: 123456, account: '**** 6917', colors: ['#B2D0CE', '#7C57FF'] },
-  { id: '2', type: 'Savings account', balance: 10000, account: '**** 4552', colors: ['#8080ff', '#21CBF3'] },
-  { id: '3', type: 'VISA', balance: 1780, account: '**** 9934', colors: ['#FF9800', '#F1FE87'] },
+  { id: '1', type: 'VISA', balance: 123456, account: '•••• 6917', colors: ['#B2D0CE', '#7C57FF'] },
+  { id: '2', type: 'Savings account', balance: 10000, account: '•••• 4552', colors: ['#8080ff', '#21CBF3'] },
+  { id: '3', type: 'VISA', balance: 1780, account: '•••• 9934', colors: ['#FF9800', '#F1FE87'] },
 ];
 
 export default function HomeScreen() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
 
@@ -29,13 +32,9 @@ export default function HomeScreen() {
 
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={{ fontFamily: 'Medium', fontSize: 18 }} >ENERO 2025</Text>
+        <Text style={{ fontFamily: 'Medium', fontSize: 20 }} >ENERO 2025</Text>
         <Text style={styles.subtitle}>Buenos días Ricardo</Text>
       </View>
-      
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        
 
       {/* Expense Section */}
       <View style={styles.expenseSection}>
@@ -57,6 +56,8 @@ export default function HomeScreen() {
           <Text style={styles.percentageText}> 30% of Your Expenses, Looks Good.</Text>
         </View>
       </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
 
       {/* Info Section */}
       <View style={styles.infoSection}>
@@ -123,20 +124,25 @@ export default function HomeScreen() {
         />
       </View>
 
-
+      <TouchableOpacity
+        onPress={() => router.push("pages/score")} // Navigate to the "score" screen
+      >
       <View style={styles.footer}>
-        {/* Blurred Background Letters */}
-
-       <BlurView intensity={80} tint="default"  style={styles.blurredTextContainer}>
-       <Text style={styles.blurredText}>AA</Text>
-      </BlurView>
+      {/* Blurred Background Letters */}
+        <BlurView intensity={30} tint="default" experimentalBlurMethod="dimezisBlurView" style={styles.blurredTextContainer}>
+          <Text style={styles.blurredText}>AA</Text>
+        </BlurView>
 
         {/* Score and Description */}
-        <Text style={styles.footerText}>0.780</Text>
+        <View style={[styles.row, { flexDirection: "row" }]}>
+          <Text style={styles.footerText}>0.780</Text>
+          <Text style={styles.footerText}>AA</Text>
+        </View>
         <Text style={styles.footerDescription}>
-        Consider reviewing expenses for possible reductions. Avoid unnecessary large purchases or debt accumulation. Focus on maintaining a stable balance between savings and spending.        
+          Consider reviewing expenses for possible reductions. Avoid unnecessary large purchases or debt accumulation. Focus on maintaining a stable balance between savings and spending.
         </Text>
-      </View>
+    </View>
+    </TouchableOpacity>
 
         <View style={styles.bottomInfoSection}>
           <View style={styles.bottomInfoCard}>
@@ -175,8 +181,8 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: height * 0.30,
-    backgroundColor: '#EDD2FC',
+    height: height * 0.35,
+    backgroundColor: '#C0B3DE',
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
@@ -185,16 +191,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     color: '#000',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#0C3B35',
     fontFamily: "Medium", 
   },
   expenseSection: {
-    marginBottom: 20,
+    marginBottom: 25,
   },
   row: {
     flexDirection: 'row',
@@ -219,10 +225,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1FFF3',
     borderRadius: 10,
     overflow: 'hidden',
-    marginVertical: 10,
+    marginVertical: 15,
   },
   progressBar: {
-    width: '30%',
+    width: '70%',
     height: '100%',
     backgroundColor: '#000',
   },
@@ -299,7 +305,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   cardsSection: {
-    marginVertical: 18,
+    marginVertical: 15,
   },
   cardItem: {
     width: cardWidth,
@@ -336,12 +342,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footer: {
-    alignItems: 'center',
     marginTop: "10",
     backgroundColor: '#D9D9D9',
     borderRadius: 16,
     padding: 15,
     overflow: 'hidden', // Ensures no overflow outside the card
+    borderColor: "#b6d7a8",
+    borderWidth: 2
   },
   blurredTextContainer: {
     position: 'absolute',
@@ -357,7 +364,7 @@ const styles = StyleSheet.create({
     fontSize: 120,
     fontFamily: "Bold",
     color: '#b6d7a8',
-    opacity: 0.7,
+    opacity: 0.90,
     transform: [{ rotate: '-15deg' }], // Add rotation if needed
   },
   footerText: {
