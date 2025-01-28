@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     },
     header: {
         marginTop: 40,
-        marginBottom: 5,
+        marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
@@ -244,17 +244,17 @@ const styles = StyleSheet.create({
     labelsContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 8,
+        marginHorizontal: 5,
     },
     label: {
         fontSize: 11,
         color: "#000",
-        fontFamily: "Regular",
+        fontFamily: "Bold",
     },
     label2: {
         fontSize: 12,
         color: "#000",
-        fontFamily: "Light",
+        fontFamily: "Bold",
     },
     scores: {
         justifyContent: "space-around",
