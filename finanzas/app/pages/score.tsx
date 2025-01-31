@@ -76,8 +76,8 @@ export default function Score() {
             <View style={styles.header}>
                 <Text style={styles.subtitle}>Current Score:</Text>
                 <View style={styles.row2}>
-                    <Text style={{ fontFamily: "Bold", fontSize: 36 }}>0.5</Text>
-                    <Text style={{ fontFamily: "Black", fontSize: 36 }}>BBB</Text>
+                    <Text style={{ fontFamily: "Bold", fontSize: 36, color: "#fff" }}>0.5</Text>
+                    <Text style={{ fontFamily: "Black", fontSize: 36, color: "#fff" }}>BBB</Text>
                 </View>
                 <View style={styles.row2}>
                     <Text style={styles.subtitle}>Siguiente registro en: 3 dias 15 horas 26 minutos</Text>
@@ -114,7 +114,7 @@ export default function Score() {
             <View style={styles.scores}>
                 <View style={styles.row}>
                     <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
+                        colors={['#DED8E3', '#9987A9']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.cardItem}
@@ -125,7 +125,7 @@ export default function Score() {
                     </LinearGradient>
 
                     <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
+                        colors={['#9987A9', '#DED8E3']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.cardItem}
@@ -138,7 +138,7 @@ export default function Score() {
 
                 <View style={styles.row}>
                     <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
+                        colors={['#DED8E3', '#9987A9']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.cardItem}
@@ -149,7 +149,7 @@ export default function Score() {
                     </LinearGradient>
 
                     <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
+                        colors={['#9987A9', '#DED8E3']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.cardItem}
@@ -193,7 +193,7 @@ const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F1FAEE",
+        backgroundColor: "#DED8E3",
         paddingHorizontal: 16,
     },
     backcard: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         height: height * 0.35,
-        backgroundColor: "#C0B3DE",
+        backgroundColor: "#0C051D",
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
     },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        color: "#0C3B35",
+        color: "#D6F6DD",
         fontFamily: "Medium",
     },
     row: {
@@ -225,13 +225,13 @@ const styles = StyleSheet.create({
     },
     expenseSection: {
         marginBottom: 20,
-        backgroundColor: "#FAE1FA",
+        backgroundColor: "#9987A9",
         borderRadius: 28,
         padding: 8,
     },
     progressBarContainer: {
         height: 18,
-        backgroundColor: "#F1FFF3",
+        backgroundColor: "#fff",
         borderRadius: 10,
         overflow: "hidden",
         marginVertical: 13,
@@ -248,12 +248,12 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 11,
-        color: "#000",
+        color: "#fff",
         fontFamily: "Bold",
     },
     label2: {
         fontSize: 12,
-        color: "#000",
+        color: "#fff",
         fontFamily: "Bold",
     },
     scores: {
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
       transactionSubtitle: {
         fontSize: 12,
         fontFamily: "Light",
-        color: "gray",
+        color: "#0C051D",
       },
       transactionAmount: {
         fontSize: 14,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
       },
       changePeriod: {
         fontSize: 14,
-        color: "#007AFF",
+        color: "#957FEF",
         fontFamily: "Medium",
       },
       transactionsList: {

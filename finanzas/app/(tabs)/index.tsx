@@ -18,7 +18,7 @@ import { useRouter } from "expo-router";
 const cardsData = [
   { id: '1', type: 'VISA', balance: 123456, account: '•••• 6917', colors: ['#B2D0CE', '#7C57FF'] },
   { id: '2', type: 'Savings account', balance: 10000, account: '•••• 4552', colors: ['#8080ff', '#21CBF3'] },
-  { id: '3', type: 'VISA', balance: 1780, account: '•••• 9934', colors: ['#FF9800', '#F1FE87'] },
+  { id: '3', type: 'Efectivo', balance: 1780, account: 'MXN', colors: ['#F1FE87', '#D6F6DD'] },
 ];
 
 export default function HomeScreen() {
@@ -32,7 +32,7 @@ export default function HomeScreen() {
 
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={{ fontFamily: 'Medium', fontSize: 20 }} >ENERO 2025</Text>
+        <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#DAC4F7"}} >ENERO 2025</Text>
         <Text style={styles.subtitle}>Buenos días Ricardo</Text>
       </View>
 
@@ -52,7 +52,7 @@ export default function HomeScreen() {
           <View style={styles.progressBar} />
         </View>
          <View style={styles.row2}>
-          <FontAwesome6 name="check-circle" size={15} color={"#0C3B35"}  />
+          <FontAwesome6 name="check-circle" size={15} color={"#DED8E3"}  />
           <Text style={styles.percentageText}> 30% of Your Expenses, Looks Good.</Text>
         </View>
       </View>
@@ -69,10 +69,10 @@ export default function HomeScreen() {
                 style={styles.progressImage}
               />
             </View>
-            <Text style={styles.totalText}>$000,800.0</Text>
+            <Text style={styles.totalText}>$ 16,000.0</Text>
           </View>
 
-          <View style={styles.divider} />
+          <View style={styles.divider2} />
 
           <View style={styles.rightSection}>
             <View style={styles.infoRow}>
@@ -85,7 +85,7 @@ export default function HomeScreen() {
               <Feather name="arrow-down-circle" size={32} color="#052224" />
               <Text style={styles.infoText}>Retiros este mes</Text>
             </View>
-            <Text style={styles.infoValueNegative}>- $ 100.00</Text>
+            <Text style={styles.infoValueNegative}>- $ 0,000.00</Text>
           </View>
         </View>
       </View>
@@ -102,7 +102,7 @@ export default function HomeScreen() {
               // Add Card
               return (
                 <TouchableOpacity style={styles.addCard}>
-                  <Feather name="plus" size={32} color="#555" />
+                  <Feather name="plus" size={32} color="#000" />
                 </TouchableOpacity>
               );
             }
@@ -129,8 +129,8 @@ export default function HomeScreen() {
       >
       <View style={styles.footer}>
       {/* Blurred Background Letters */}
-        <BlurView intensity={30} tint="default" experimentalBlurMethod="dimezisBlurView" style={styles.blurredTextContainer}>
-          <Text style={styles.blurredText}>AA</Text>
+        <BlurView intensity={30} tint="default" style={styles.blurredTextContainer}>
+          <Text style={styles.blurredText}>BB</Text>
         </BlurView>
 
         {/* Score and Description */}
@@ -173,7 +173,7 @@ const cardWidth = width * 0.4;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1FAEE',
+    backgroundColor: '#fff',
     paddingHorizontal: 16,
   },
   backcard: {
@@ -182,21 +182,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: height * 0.35,
-    backgroundColor: '#C0B3DE',
+    backgroundColor: '#0C051D',
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
   header: {
     marginTop: 40,
+    color: '#C2FFD6',
     marginBottom: 20,
   },
   title: {
     fontSize: 26,
-    color: '#000',
+    color: '#C2FFD6',
   },
   subtitle: {
     fontSize: 16,
-    color: '#0C3B35',
+    color: '#D6F6DD',
     fontFamily: "Medium", 
   },
   expenseSection: {
@@ -213,16 +214,16 @@ const styles = StyleSheet.create({
   expenseText: {
     fontSize: 24,
     fontFamily: "Bold",
-    color: '#0D2653',
+    color: '#fff',
   },
   debtText: {
     fontSize: 24,
     fontFamily: "Bold",
-    color: '#00368C',
+    color: '#F4989C',
   },
   progressBarContainer: {
     height: 14,
-    backgroundColor: '#F1FFF3',
+    backgroundColor: '#fff',
     borderRadius: 10,
     overflow: 'hidden',
     marginVertical: 15,
@@ -230,12 +231,12 @@ const styles = StyleSheet.create({
   progressBar: {
     width: '70%',
     height: '100%',
-    backgroundColor: '#000',
+    backgroundColor: '#6A5ACD',
   },
   percentageText: {
     fontSize: 14,
     fontFamily: "Medium",
-    color: '#0C3B35',
+    color: '#fff',
   },
   infoSection: {
     flexDirection: 'row',
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: width - 32,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#E6E8FF',
     borderRadius: 28,
     padding: 16,
   },
@@ -268,13 +269,19 @@ const styles = StyleSheet.create({
   },
   totalText: {
     fontSize: 19,
-    fontFamily: "Regular",
+    fontFamily: "SemiBold",
     marginTop: 8,
   },
   divider: {
     width: 2,
     height: '90%',
     backgroundColor: '#fff',
+    marginHorizontal: 16,
+  },
+  divider2: {
+    width: 2,
+    height: '90%',
+    backgroundColor: '#000',
     marginHorizontal: 16,
   },
   rightSection: {
@@ -288,20 +295,20 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    fontFamily: "Light",
+    fontFamily: "Medium",
     color: '#052224',
     marginLeft: 8,
   },
   infoValue: {
     fontSize: 16,
     color: '#052224',
-    fontFamily: "Light",
+    fontFamily: "Medium",
     marginLeft: 'auto',
   },
   infoValueNegative: {
     fontSize: 16,
     color: '#00368C',
-    fontFamily: "Light",
+    fontFamily: "Medium",
     marginLeft: 'auto',
   },
   cardsSection: {
@@ -337,17 +344,17 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderStyle: 'dotted',
     borderWidth: 2,
-    borderColor: '#CCC',
+    borderColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
   },
   footer: {
     marginTop: "10",
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#0C051D',
     borderRadius: 16,
     padding: 15,
     overflow: 'hidden', // Ensures no overflow outside the card
-    borderColor: "#b6d7a8",
+    borderColor: "#E6E8FF",
     borderWidth: 2
   },
   blurredTextContainer: {
@@ -363,7 +370,7 @@ const styles = StyleSheet.create({
   blurredText: {
     fontSize: 120,
     fontFamily: "Bold",
-    color: '#b6d7a8',
+    color: '#7161EF',
     opacity: 0.90,
     transform: [{ rotate: '-15deg' }], // Add rotation if needed
   },
@@ -371,11 +378,11 @@ const styles = StyleSheet.create({
     fontSize: 32,
     alignSelf: "flex-start",
     fontFamily: "SemiBold",
-    color: '#000',
+    color: '#E6E8FF',
   },
   footerDescription: {
     fontSize: 13,
-    color: '#000',
+    color: '#E6E8FF',
     alignSelf: "flex-start",
     fontFamily: "Regular",
     textAlign: 'justify',
@@ -411,7 +418,7 @@ const styles = StyleSheet.create({
   dividerVertical: {
     width: 2,
     height: '70%',
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     marginHorizontal: 8,
   },
   scrollContent: {

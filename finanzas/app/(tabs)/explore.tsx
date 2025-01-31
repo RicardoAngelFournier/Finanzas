@@ -1,206 +1,164 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, Animated, Dimensions, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { LineChart } from "react-native-gifted-charts"
-
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { LineChart } from "react-native-gifted-charts";
 
 export default function Score() {
-  const progress = useRef(new Animated.Value(0)).current; // Animated value for the progress bar
-  const currentScore = 0.688; // Example variable that determines the progress
+  const currentSavings = 16000;
+  const [selectedMonth, setSelectedMonth] = useState(0);
+  const tabTranslateX = useRef(new Animated.Value(0)).current;
 
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"];
+  const tabWidth = (width * 0.9) / months.length; // Ensure tab stays within bounds
+
+  // Data Sets (Both always shown)
   const data1 = [
-    {value: 70},
-    {value: 36},
-    {value: 50},
-    {value: 40},
-    {value: 18},
-    {value: 38},
+    { value: 15500 }, { value: 16600 }, { value: 17600 },
+    { value: 16880 }, { value: 16660 }, { value: 17600 }, { value: 18600 } , { value: 18600 }
   ];
   const data2 = [
-    {value: 50},
-    {value: 10},
-    {value: 45},
-    {value: 30},
-    {value: 45},
-    {value: 18},
+    { value: 14200 }, { value: 15200 }, { value: 16200 },
+    { value: 17200 }, { value: 18200 }, { value: 19200 }, { value: 20200 } , { value: 18600 } , { value: 18600 }
   ];
-  
 
-  useEffect(() => {
-    // Calculate width percentage based on the score
-    const progressWidth = (currentScore / 1) * 100; // Assuming 1 is the max score
-    // Animate the progress bar width
-    Animated.timing(progress, {
-      toValue: progressWidth, // Target width as percentage
-      duration: 1000, // Animation duration in ms
-      useNativeDriver: false, // For width animation
+  // Handle Tab Change Animation
+  const handleTabPress = (index) => {
+    setSelectedMonth(index);
+    Animated.spring(tabTranslateX, {
+      toValue: tabWidth * index, // Adjusted to keep within bounds
+      useNativeDriver: true,
     }).start();
-  }, [currentScore]);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Background Card */}
       <View style={styles.backcard} />
 
-      {/* Header Section */}
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.subtitle}>Current Score:</Text>
+        <Text style={styles.subtitle}>Ahorro:</Text>
         <View style={styles.row2}>
-          <Text style={{ fontFamily: "ExtraBold", fontSize: 36 }}>0.688</Text>
-          <Text style={{ fontFamily: "ExtraBold", fontSize: 36 }}>BBB</Text>
+          <Text style={{ fontFamily: "ExtraBold", fontSize: 38, color: "#ffffff" }}>$ {currentSavings} MXN</Text>
         </View>
       </View>
 
-      {/* Expense Section */}
-      <View style={styles.expenseSection}>
-          <View
-              style={{
-                paddingVertical: 0,
-              }}>
-              <LineChart
-                areaChart
-                curved
-                data={data1}
-                data2={data2}
-                hideDataPoints
-                spacing={68}
-                color1="#8a56ce"
-                color2="#56acce"
-                startFillColor1="#8a56ce"
-                startFillColor2="#56acce"
-                endFillColor1="#8a56ce"
-                endFillColor2="#56acce"
-                startOpacity={0.9}
-                endOpacity={0.2}
-                initialSpacing={0}
-                noOfSections={4}
-                yAxisColor="white"
-                yAxisThickness={0}
-                rulesType="solid"
-                rulesColor="gray"
-                yAxisTextStyle={{color: 'gray'}}
-                yAxisLabelSuffix="%"
-                xAxisColor="lightgray"
-                pointerConfig={{
-                  pointerStripUptoDataPoint: true,
-                  pointerStripColor: 'lightgray',
-                  pointerStripWidth: 2,
-                  strokeDashArray: [2, 5],
-                  pointerColor: 'lightgray',
-                  radius: 4,
-                  pointerLabelWidth: 100,
-                  pointerLabelHeight: 120,
-                  pointerLabelComponent: items => {
-                    return (
-                      <View
-                        style={{
-                          height: 120,
-                          width: 100,
-                          backgroundColor: '#282C3E',
-                          borderRadius: 4,
-                          justifyContent:'center',
-                          paddingLeft:16,
-                        }}>
-                        <Text style={{color: 'lightgray',fontSize:12}}>{2018}</Text>
-                        <Text style={{color: 'white', fontWeight:'bold'}}>{items[0].value}</Text>
-                        <Text style={{color: 'lightgray',fontSize:12,marginTop:12}}>{2019}</Text>
-                        <Text style={{color: 'white', fontWeight:'bold'}}>{items[1].value}</Text>
-                      </View>
-                    );
-                  },
-                }}
-              />
-            </View>  
+      {/* Graph */}
+      <View style={{ paddingVertical: 0, width }}>
+        <LineChart
+          yAxisOffset={13000}
+          maxValue={7000}
+          height={height * 0.25}
+          width={width}
+          areaChart
+          isAnimated
+          animateOnDataChange
+          curved
+          data={data1} // Always show both datasets
+          data2={data2}
+          spacing={60}
+          color1="#B78AFF"
+          color2="#A8DADC"
+          startFillColor1="#B78AFF"
+          startFillColor2="#A8DADC"
+          endFillColor1="#B78AFF"
+          endFillColor2="#A8DADC"
+          startOpacity={0.9}
+          endOpacity={0.2}
+          initialSpacing={0}
+          noOfSections={5}
+          yAxisColor="white"
+          yAxisThickness={0}
+          hideYAxisText
+          pointerConfig={{
+            pointerStripUptoDataPoint: true,
+            pointerStripColor: 'lightgray',
+            pointerStripWidth: 2,
+            strokeDashArray: [2, 5],
+            pointerColor: 'lightgray',
+            radius: 4,
+            pointerLabelWidth: 100,
+            pointerLabelHeight: 120,
+            pointerLabelComponent: items => {
+              return (
+                <View
+                  style={{
+                    height: 120,
+                    width: 100,
+                    backgroundColor: '#0C051D',
+                    borderRadius: 4,
+                    justifyContent:'center',
+                    paddingLeft:16,
+                  }}>
+                  <Text style={{color: 'lightgray',fontSize:12}}>Actual</Text>
+                  <Text style={{color: 'white', fontWeight:'bold'}}>{items[0].value}</Text>
+                  <Text style={{color: 'lightgray',fontSize:12,marginTop:12}}>Target 40%</Text>
+                  <Text style={{color: 'white', fontWeight:'bold'}}>{items[1].value}</Text>
+                </View>
+              );
+            },
+          }}
+        />
       </View>
 
-        <View style={styles.scores}>
-                <View style={styles.row}>
-                    <LinearGradient
-                        colors={['#EFD9CE', '#21CBF3']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="money-bill-wave" size={30} color="black" />
-                        <Text style={styles.cardType}>Spare</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
-
-                    <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="credit-card" size={30} color="black" />
-                        <Text style={styles.cardType}>Deuda</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
-                </View>
-
-                <View style={styles.row}>
-                    <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="circle-dollar-to-slot" size={30} color="black" />
-                        <Text style={styles.cardType}>Ahorro</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
-
-                    <LinearGradient
-                        colors={['#8080ff', '#21CBF3']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="sack-dollar" size={30} color="black" />
-                        <Text style={styles.cardType}>Ahorro</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
-                </View>
-
-            </View>
-
-       
+      {/* Capsule Tab Bar */}
+      <View style={styles.tabBarContainer}>
+        <View style={styles.tabBar}>
+          <Animated.View style={[styles.tabIndicator, { width: tabWidth - 10, transform: [{ translateX: tabTranslateX }] }]} />
+          {months.map((month, index) => (
+            <Pressable key={index} style={styles.tabButton} onPress={() => handleTabPress(index)}>
+              <Text style={[styles.tabText, selectedMonth === index && { color: "black" }]}>{month}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
+
+      {/* Other Components */}
+      <View style={styles.scores}>
+        <View style={styles.row}>
+          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+            <FontAwesome6 name="money-bill-wave" size={30} color="black" />
+            <Text style={styles.cardType}>Spare</Text>
+            <Text style={styles.cardBalance}>0.81</Text>
+          </LinearGradient>
+
+          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+            <FontAwesome6 name="credit-card" size={30} color="black" />
+            <Text style={styles.cardType}>Deuda</Text>
+            <Text style={styles.cardBalance}>0.81</Text>
+          </LinearGradient>
+        </View>
+      </View>
+    </View>
   );
 }
-
-// Hide the header for this screen
-export const screenOptions = {
-  headerShown: false,
-};
-
 const { width, height } = Dimensions.get("window");
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F1FAEE",
-    paddingHorizontal: 16,
+    backgroundColor: "#DED8E3",
   },
   backcard: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: height * 0.35,
-    backgroundColor: "#C0B3DE",
+    height: height * 0.4,
+    backgroundColor: "#0C051D",
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
   header: {
     marginTop: 40,
     height:50,
+    paddingHorizontal: 16,
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
-    color: "#0C3B35",
+    color: "#fff",
     fontFamily: "Medium",
   },
   row: {
@@ -211,54 +169,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  expenseSection: {
-    marginBottom: 25,
-    
-  },
-  expenseText: {
-    fontSize: 24,
-    fontFamily: "Bold",
-    color: "#EFD9CE",
-  },
-  debtText: {
-    fontSize: 24,
-    fontFamily: "Bold",
-    color: "#EFD9CE",
-  },
-  divider: {
-    width: 2,
-    height: "90%",
-    backgroundColor: "#fff",
-    marginHorizontal: 16,
-  },
-  progressBarContainer: {
-    height: 14,
-    backgroundColor: "#F1FFF3",
-    borderRadius: 10,
-    overflow: "hidden",
-    marginVertical: 15,
-  },
-  labelsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
   label: {
     fontSize: 12,
-    color: "#000",
+    color: "#fff",
     fontFamily: "Medium",
   },
   scores: {
-    justifyContent: "space-around",
+    justifyContent: "center",
     marginTop: 10,
-    marginBottom: 15,
+    marginBottom: 10,
 },
 cardItem: {
-  height: 110,
+  height: 100,
   borderRadius: 16,
-  padding: 12,
-  justifyContent: 'space-between',
-  width: 140,
+  padding: 15,
+  justifyContent: 'center',
+  alignItems: "center",
+  width: 150,
   margin: 5
 },
 cardType: {
@@ -276,4 +203,9 @@ cardAccount: {
   fontFamily: "Light",
   color: '#000',
 },
+tabBarContainer: { alignItems: "center", marginVertical: 20 },
+tabBar: { flexDirection: "row", backgroundColor: "#232B5D", borderRadius: 30, padding: 5, width: width * 0.9, alignItems: "center", justifyContent: "space-between", position: "relative" },
+tabIndicator: { position: "absolute", backgroundColor: "white", width: (width * 0.9) / 7 - 10, height: "85%", borderRadius: 25, left: 5 },
+tabButton: { flex: 1, alignItems: "center", paddingVertical: 8 },
+tabText: { fontSize: 14, fontWeight: "bold", color: "#A8DADC" },
 });
