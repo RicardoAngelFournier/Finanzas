@@ -5,7 +5,6 @@ import { PieChart } from "react-native-gifted-charts";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, } from "react-native-reanimated";
 import { ScrollView } from "react-native";
-import { interpolate } from "react-native-reanimated";
 import Carousel  from "react-native-reanimated-carousel";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -18,15 +17,6 @@ export default function Credit() {
 
   {/* animation */ }
 
-  const toggleExpand = () => {
-    setExpanded((prev) => !prev);
-    animationHeight.value = expanded ? 0 : 100; // Change the height when toggling
-  };
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      height: withTiming(animationHeight.value, { duration: 300 }), // Smooth transition
-    };
-  });
 
   const transactionData = [
     {
@@ -61,6 +51,14 @@ export default function Credit() {
       time: "11:56 AM",
       amount: "-$300.00",
     },
+    {
+      id: "5",
+      title: "Tennis",
+      type: "Pago Unico",
+      date: "18 Enero",
+      time: "11:56 AM",
+      amount: "-$300.00",
+    },
   ];
 
 
@@ -69,7 +67,7 @@ export default function Credit() {
       {/* Top Section */}
       <View style={styles.cardTop}>
         <View>
-          <Text style={styles.totalBalanceText}>Total Balance</Text>
+          <Text style={styles.totalBalanceText}> Citibanamex Clasica</Text>
           <Text style={styles.balanceAmount}>{item.totalBalance}</Text>
         </View>
         <View>
@@ -141,7 +139,7 @@ export default function Credit() {
           scrollAnimationDuration={1000}
           onSnapToItem={(index) => setCurrentIndex(index)}
           pagingEnabled
-
+          
           renderItem={({ index }) => (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               {index === 0 ? (
@@ -155,7 +153,7 @@ export default function Credit() {
                   {/* Top Section */}
                   <View style={styles.cardTop}>
                     <View>
-                      <Text style={styles.totalBalanceText}>Total Balance</Text>
+                    <Text style={styles.totalBalanceText}> Citibanamex Clasica</Text>
                       <Text style={styles.balanceAmount}>$10,000.00</Text>
                     </View>
                     <View>
@@ -191,7 +189,7 @@ export default function Credit() {
                   end={{ x: 1, y: 1 }}
                   style={styles.cardContainer}
                 >
-                  <Text style={{ fontSize: 16, color: "white", fontFamily: "Bold" }}>
+                  <Text style={{ fontSize: 20, color: "white", fontFamily: "Bold" }}>
                     Citibanamex Clasica
                   </Text>
                   <View style={{ padding: 5, alignItems: "center" }}>
@@ -199,6 +197,7 @@ export default function Credit() {
                       data={pieData}
                       isAnimated
                       donut
+
                       showGradient
                       sectionAutoFocus
                       radius={80}
@@ -303,16 +302,6 @@ const styles = StyleSheet.create({
     color: "#957FEF",
     fontFamily: "Medium",
   },
-  graphcard: {
-    margin: 10,
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: "#232B5D",
-  },
-  chevronButton: {
-    alignSelf: "center",
-    marginTop: 10,
-  },
   chevron: {
     fontSize: 20,
     color: "white",
@@ -342,7 +331,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    backgroundColor: "#E6E6E6",
+    backgroundColor: "#fff",
     borderRadius: 10,
     marginBottom: 10,
   },
@@ -375,7 +364,7 @@ const styles = StyleSheet.create({
     color: "red",
   },
   cardContainer: {
-    borderRadius: 15,
+    borderRadius: 18,
     padding: 20,
     margin: 10,
     shadowColor: "#000",
@@ -393,7 +382,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   totalBalanceText: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#FFF",
     fontFamily: "Regular", // Adjust based on your fonts
   },
@@ -409,7 +398,7 @@ const styles = StyleSheet.create({
   },
   cardNumber: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Bold",
     color: "#fff",
   },
   cardBottom: {

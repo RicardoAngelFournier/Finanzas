@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { BlurView } from 'expo-blur';
 import { useRouter } from "expo-router";
+import { Avatar } from '@rneui/themed';
 
 const cardsData = [
   { id: '1', type: 'VISA', balance: 123456, account: '•••• 6917', colors: ['#B2D0CE', '#7C57FF'] },
@@ -32,8 +33,16 @@ export default function HomeScreen() {
 
       {/* Header Section */}
       <View style={styles.header}>
-        <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#DAC4F7"}} >ENERO 2025</Text>
-        <Text style={styles.subtitle}>Buenos días Ricardo</Text>
+          <View style={styles.row3}>
+            <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#DAC4F7"}} >ENERO 2025</Text>
+              <Avatar
+                  size={32}
+                  rounded
+                  title="RA"
+                  containerStyle={{ backgroundColor: "#DAC4F7" }}
+                />
+          </View>
+          <Text style={styles.subtitle}>Buenos días Ricardo</Text>
       </View>
 
       {/* Expense Section */}
@@ -188,12 +197,12 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 40,
-    color: '#C2FFD6',
+    color: '#fff',
     marginBottom: 20,
   },
   title: {
     fontSize: 26,
-    color: '#C2FFD6',
+    color: '#fff',
   },
   subtitle: {
     fontSize: 16,
@@ -210,6 +219,11 @@ const styles = StyleSheet.create({
   row2: {
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  row3: {
+    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   expenseText: {
     fontSize: 24,

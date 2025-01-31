@@ -46,6 +46,12 @@ export default function RootLayout() {
           headerShown: false,
         }}
       />
+              <Stack.Screen
+        name="pages/infoscore"
+        options={{
+          headerShown: false,
+        }}
+      />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Animated, Dimensions, Pressable } from "react-n
 import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { LineChart } from "react-native-gifted-charts";
+import { FlatList } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 export default function Score() {
   const currentSavings = 16000;
@@ -22,6 +24,37 @@ export default function Score() {
     { value: 17200 }, { value: 18200 }, { value: 19200 }, { value: 20200 } , { value: 18600 } , { value: 18600 }
   ];
 
+  const savingData = [
+    {
+      id: "1",
+      type: "Ingreso",
+      date: "13 Enero",
+      time: "8:25 PM",
+      amount: "$4,000.00",
+    },
+    {
+      id: "2",
+      type: "Ingreso",
+      date: "16 Enero",
+      time: "12:56 PM",
+      amount: "$1,200.00",
+    },
+    {
+      id: "3",
+      type: "Retiro",
+      date: "18 Enero",
+      time: "11:56 AM",
+      amount: "-$300.00",
+    },
+    {
+      id: "4",
+      type: "Retiro",
+      date: "18 Enero",
+      time: "11:56 AM",
+      amount: "-$300.00",
+    },
+  ];
+
   // Handle Tab Change Animation
   const handleTabPress = (index) => {
     setSelectedMonth(index);
@@ -31,20 +64,40 @@ export default function Score() {
     }).start();
   };
 
+    const renderSavings = ({ item }) => (
+      <View style={styles.transactionCard}>
+        <View style={styles.iconContainer}>
+          <View style={styles.iconBackground} />
+        </View>
+        <View style={styles.transactionDetails}>
+          <Text style={styles.transactionTitle}>
+            {item.type}
+          </Text>
+          <Text style={styles.transactionSubtitle}>
+            {item.date} | {item.time}
+          </Text>
+        </View>
+        <Text style={styles.transactionAmount}>{item.amount}</Text>
+      </View>
+    );
+
   return (
     <View style={styles.container}>
       <View style={styles.backcard} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.subtitle}>Ahorro:</Text>
-        <View style={styles.row2}>
-          <Text style={{ fontFamily: "ExtraBold", fontSize: 38, color: "#ffffff" }}>$ {currentSavings} MXN</Text>
+      <TouchableOpacity onPress={() => console.log("Navigate to details")} activeOpacity={0.7}>
+        <View style={styles.header}>
+          <Text style={styles.subtitle}>Ahorro:</Text>
+          <View style={styles.row2}>
+            <Text style={{ fontFamily: "ExtraBold", fontSize: 38, color: "#ffffff" }}>
+              $ {currentSavings} MXN 
+            </Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Graph */}
-      <View style={{ paddingVertical: 0, width }}>
+      <View style={{ marginTop: 15 }}>
         <LineChart
           yAxisOffset={13000}
           maxValue={7000}
@@ -115,20 +168,36 @@ export default function Score() {
 
       {/* Other Components */}
       <View style={styles.scores}>
-        <View style={styles.row}>
+        <View style={styles.row2}>
+
           <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
-            <FontAwesome6 name="money-bill-wave" size={30} color="black" />
-            <Text style={styles.cardType}>Spare</Text>
-            <Text style={styles.cardBalance}>0.81</Text>
+            <Text style={styles.cardType}>Aumento este mes</Text>
+            <Text style={styles.cardBalance}>$ 1280</Text>
           </LinearGradient>
 
           <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
-            <FontAwesome6 name="credit-card" size={30} color="black" />
-            <Text style={styles.cardType}>Deuda</Text>
-            <Text style={styles.cardBalance}>0.81</Text>
+            <Text style={styles.cardType}>% De sueldo ahorrado</Text>
+            <Text style={styles.cardBalance}>41.5</Text>
           </LinearGradient>
+
+          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+            <Text style={styles.cardType}>Retiros este mes</Text>
+            <Text style={styles.cardBalance}>$ 880</Text>
+          </LinearGradient>
+          
         </View>
+
+
       </View>
+      
+      <FlatList
+                data={savingData}
+                renderItem={renderSavings}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.transactionsList}
+                ListHeaderComponent={<Text style={styles.listHeader}>Transacciones este mes</Text>}
+              />
+
     </View>
   );
 }
@@ -145,7 +214,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: height * 0.4,
+    height: height * 0.40,
     backgroundColor: "#0C051D",
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
@@ -154,7 +223,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     height:50,
     paddingHorizontal: 16,
-    marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
@@ -177,7 +245,7 @@ const styles = StyleSheet.create({
   scores: {
     justifyContent: "center",
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 5,
 },
 cardItem: {
   height: 100,
@@ -185,27 +253,70 @@ cardItem: {
   padding: 15,
   justifyContent: 'center',
   alignItems: "center",
-  width: 150,
-  margin: 5
+  width: 120,
+  margin: 2
 },
 cardType: {
-  fontSize: 16,
+  fontSize: 14,
   fontFamily: "Regular",
   color: '#333',
 },
 cardBalance: {
-  fontSize: 21,
-  fontFamily: "Light",
+  fontSize: 19,
+  fontFamily: "Regular",
   color: '#000',
 },
-cardAccount: {
-  fontSize: 12,
-  fontFamily: "Light",
-  color: '#000',
-},
-tabBarContainer: { alignItems: "center", marginVertical: 20 },
+tabBarContainer: { alignItems: "center" },
 tabBar: { flexDirection: "row", backgroundColor: "#232B5D", borderRadius: 30, padding: 5, width: width * 0.9, alignItems: "center", justifyContent: "space-between", position: "relative" },
 tabIndicator: { position: "absolute", backgroundColor: "white", width: (width * 0.9) / 7 - 10, height: "85%", borderRadius: 25, left: 5 },
 tabButton: { flex: 1, alignItems: "center", paddingVertical: 8 },
 tabText: { fontSize: 14, fontWeight: "bold", color: "#A8DADC" },
+transactionsList: {
+  paddingHorizontal: 16,
+  paddingBottom: 16,
+},
+listHeader: {
+  fontSize: 16,
+  fontFamily: "Bold",
+  alignContent: "center",
+  alignItems: "center",
+  justifyContent: "center",
+  marginVertical: 10,
+},
+transactionCard: {
+  flexDirection: "row",
+  alignItems: "center",
+  padding: 10,
+  backgroundColor: "#fff",
+  borderRadius: 10,
+  marginBottom: 10,
+},
+iconContainer: {
+  justifyContent: "center",
+  alignItems: "center",
+  marginRight: 10,
+},
+iconBackground: {
+  height: 40,
+  width: 40,
+  backgroundColor: "#957FEF",
+  borderRadius: 20,
+},
+transactionDetails: {
+  flex: 1,
+},
+transactionTitle: {
+  fontSize: 14,
+  fontFamily: "Bold",
+},
+transactionSubtitle: {
+  fontSize: 12,
+  fontFamily: "Light",
+  color: "gray",
+},
+transactionAmount: {
+  fontSize: 16,
+  fontFamily: "Bold",
+  color: "black",
+},
 });

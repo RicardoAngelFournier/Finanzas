@@ -5,12 +5,14 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { FlatList } from "react-native";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function Score() {
     const progress = useRef(new Animated.Value(0)).current; // Animated value for the progress bar
     const currentScore = 0.8; // Example variable that determines the progress
     const [selectedPeriod, setSelectedPeriod] = useState("Enero"); // Default to "January"
-    
+    const router = useRouter();
+
     const scores = [
         {
           id: "1",
@@ -84,6 +86,10 @@ export default function Score() {
                 </View>
             </View>
 
+
+  <TouchableOpacity
+        onPress={() => router.push("/pages/infoscore")} // Navigate to the "score" screen
+      >
             {/* Expense Section */}
             <View style={styles.expenseSection}>
                 <View style={styles.row2}>
@@ -110,6 +116,8 @@ export default function Score() {
                     <Text style={styles.label}>AAA</Text>
                 </View>
             </View>
+        </TouchableOpacity>
+                    
 
             <View style={styles.scores}>
                 <View style={styles.row}>
