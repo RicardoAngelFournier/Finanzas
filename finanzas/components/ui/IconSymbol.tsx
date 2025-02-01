@@ -13,6 +13,7 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'insights.fill': 'insights',
   'credit-card.fill': 'credit-card',
+  'fingerprint.fill': 'fingerprint',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
 } as Partial<

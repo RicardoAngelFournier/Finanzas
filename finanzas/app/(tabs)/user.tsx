@@ -34,6 +34,26 @@ export default function User() {
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={styles.actionButton}>
           <Ionicons name="wallet" size={24} color="#0C051D" />
+          <Text style={styles.actionText}>Registrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="send" size={24} color="#0C051D" />
+          <Text style={styles.actionText}>Send</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="cash" size={24} color="#0C051D" />
+          <Text style={styles.actionText}>Request</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="time" size={24} color="#0C051D" />
+          <Text style={styles.actionText}>History</Text>
+        </TouchableOpacity>
+      </View>
+
+            {/* Action Buttons */}
+      <View style={[styles.actionsContainer, { marginTop: 10 }]}>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="wallet" size={24} color="#0C051D" />
           <Text style={styles.actionText}>Top Up</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
@@ -110,7 +130,7 @@ const styles = StyleSheet.create({
     color: "#DED8E3",
   },
   balanceContainer: {
-    backgroundColor: "#DED8E3",
+    backgroundColor: "#DAC4F7",
     padding: 20,
     borderRadius: 15,
     alignItems: "center",
@@ -132,14 +152,15 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   actionButton: {
-    backgroundColor: "#DAC4F7",
+    backgroundColor: "#E6E8FF",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
     width: 80,
   },
   actionText: {
-    fontSize: 12,
+    fontSize: 11,
+    fontFamily: "Regular",
     marginTop: 5,
     color: "#0C051D",
   },

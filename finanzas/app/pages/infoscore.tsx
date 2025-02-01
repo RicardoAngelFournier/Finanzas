@@ -108,9 +108,9 @@ const styles = StyleSheet.create({
   score: {
     top: 50,
     left: 25,
-    fontSize: 26,
+    fontSize: 30,
     color: "#fff",
-    fontFamily: "Medium",
+    fontFamily: "Bold",
 },
   title: {
     fontSize: 16,

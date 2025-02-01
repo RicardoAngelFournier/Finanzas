@@ -51,7 +51,7 @@ export default function TabLayout() {
         name="user"
         options={{
           title: 'Usuario',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="accountBox.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="fingerprint.fill" color={color} />,
         }}
       />
     </Tabs>
