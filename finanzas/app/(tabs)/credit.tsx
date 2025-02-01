@@ -7,8 +7,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming, } from "react-n
 import { ScrollView } from "react-native";
 import Carousel  from "react-native-reanimated-carousel";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-
+c
 export default function Credit() {
   const [selectedPeriod, setSelectedPeriod] = useState("Enero"); // Default to "January"
   const [expanded, setExpanded] = useState(false);
@@ -387,9 +386,7 @@ const styles = StyleSheet.create({
     fontFamily: "Regular", // Adjust based on your fonts
   },
   balanceAmount: {
-    fontSize: 24,
-    fontFamily: "Medium",
-    color: "#FFF",
+c
   },
   cardNumberSection: {
     flexDirection: "row",
