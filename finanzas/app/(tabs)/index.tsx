@@ -103,7 +103,7 @@ export default function HomeScreen() {
             if (item.id === 'add') {
               // Add Card
               return (
-                <TouchableOpacity style={styles.addCard}>
+                <TouchableOpacity style={styles.addCard}  onPress={() => router.push("pages/newcard")}>
                   <Feather name="plus" size={32} color="#000" />
                 </TouchableOpacity>
               );
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   addCard: {
     width: cardWidth,
-    height: 120,
+    height: 150,
     borderRadius: 16,
     borderStyle: 'dotted',
     borderWidth: 2,
