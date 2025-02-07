@@ -5,6 +5,8 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { LineChart } from "react-native-gifted-charts";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native";
+import { ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Score() {
   const currentSavings = 16000;
@@ -168,8 +170,9 @@ export default function Score() {
 
       {/* Other Components */}
       <View style={styles.scores}>
+      <ScrollView horizontal>
         <View style={styles.row2}>
-
+          
           <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
             <Text style={styles.cardType}>Aumento este mes</Text>
             <Text style={styles.cardBalance}>$ 1280</Text>
@@ -184,12 +187,22 @@ export default function Score() {
             <Text style={styles.cardType}>Retiros este mes</Text>
             <Text style={styles.cardBalance}>$ 880</Text>
           </LinearGradient>
+
+          
+          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+            <Text style={styles.cardType}>Retiros este mes</Text>
+            <Text style={styles.cardBalance}>$ 880</Text>
+          </LinearGradient>
+
+          <TouchableOpacity style={styles.cardItem}>
+            <Ionicons name="wallet" size={24} color="#0C051D" />
+            <Text style={styles.cardType}>Top Up</Text>
+          </TouchableOpacity>
           
         </View>
-
-
+        </ScrollView>
       </View>
-      
+
       <FlatList
                 data={savingData}
                 renderItem={renderSavings}
@@ -263,7 +276,7 @@ cardType: {
 },
 cardBalance: {
   fontSize: 19,
-  fontFamily: "Regular",
+  fontFamily: "Medium",
   color: '#000',
 },
 tabBarContainer: { alignItems: "center" },

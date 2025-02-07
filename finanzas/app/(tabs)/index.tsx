@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   View,
@@ -17,34 +18,72 @@ import { useRouter } from "expo-router";
 import { Avatar } from '@rneui/themed';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Ionicons } from '@expo/vector-icons';
-
-const cardsData = [
-  { id: '1', type: 'VISA', balance: 123456, account: '•••• 6917', colors: ["#DED8E3", "#DED8E3", "#957FEF"] },
-  { id: '2', type: 'Savings account', balance: 10000, account: '•••• 4552', colors: ['#DED8E3', "#FAE1FA", '#A8DADC'] },
-  { id: '3', type: 'Efectivo', balance: 1780, account: 'MXN', colors: ["#DED8E3", "#D6F6DD", "#A8DADC"] },
-];
+import { supabase } from "@/database/supabaseClient";
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { Skeleton } from '@rneui/themed';
+import { Link } from 'expo-router';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [cards, setCards] = useState<{
+    id: number;
+    name: string;
+    bank: string;
+    ending: string;
+    expiration: string;
+    color: string;
+    balance?: number;  // Optional field based on your API response
+  }[]>([]);
+
+  const [loading, setLoading] = useState(true); // Add loading state
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCards(); // Fetch data when the screen is focused
+    }, [])
+  );
+
+  const loadCards = async () => {
+    try {
+      setLoading(true); // Set loading to true when starting to load cards
+      const { data, error } = await supabase
+        .from("cards")
+        .select("id, name, bank, ending, expiration, color, type, balance, issuer");
+
+      if (error) {
+        console.error("Error loading cards:", error);
+        setCards([]);  // Ensure cards is set to an empty array if there's an error
+      } else {
+        console.log("sucessful"); // Log data to check if it's fetched correctly
+        console.log(data); // Log data to check if it's fetched correctly
+        setCards(data || []); // Ensure cards is set to an empty array if no data
+      }
+    } catch (error) {
+      console.error("Unexpected error loading cards:", error);
+      setCards([]);  // Ensure cards is set to an empty array in case of unexpected error
+    } finally {
+      setLoading(false); // Set loading to false after data is fetched
+    }
+  };
 
   return (
     <View style={styles.container}>
-
       {/* Background Card */}
       <View style={styles.backcard} />
 
       {/* Header Section */}
       <View style={styles.header}>
-          <View style={styles.row3}>
-            <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#DAC4F7"}} >ENERO 2025</Text>
-              <Avatar
-                  size={32}
-                  rounded
-                  title="RA"
-                  containerStyle={{ backgroundColor: "#DAC4F7" }}
-                />
-          </View>
-          <Text style={styles.subtitle}>Buenos días Ricardo</Text>
+        <View style={styles.row3}>
+          <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#DAC4F7"}} >ENERO 2025</Text>
+          <Avatar
+            size={32}
+            rounded
+            title="RA"
+            containerStyle={{ backgroundColor: "#DAC4F7" }}
+          />
+        </View>
+        <Text style={styles.subtitle}>Buenos días Ricardo</Text>
       </View>
 
       {/* Expense Section */}
@@ -62,7 +101,7 @@ export default function HomeScreen() {
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBar} />
         </View>
-         <View style={styles.row2}>
+        <View style={styles.row2}>
           <FontAwesome6 name="check-circle" size={15} color={"#DED8E3"}  />
           <Text style={styles.percentageText}> 30% of Your Expenses, Looks Good.</Text>
         </View>
@@ -70,64 +109,101 @@ export default function HomeScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
+        {/* Action Buttons */}
+        <View style={[styles.actionsContainer, { marginTop: 0 }]}>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="wallet" size={24} color="#0C051D" />
+            <Text style={styles.actionText}>+ Ahorro</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="send" size={24} color="#0C051D" />
+            <Text style={styles.actionText}>Send</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="cash" size={24} color="#0C051D" />
+            <Text style={styles.actionText}>Request</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} onPress={() => router.push("pages/cardstest")}>
+            <Ionicons name="time" size={24} color="#0C051D" />
+            <Text style={styles.actionText}>History</Text>
+          </TouchableOpacity>
+        </View>
 
-                    {/* Action Buttons */}
-      <View style={[styles.actionsContainer, { marginTop: 0 }]}>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="wallet" size={24} color="#0C051D" />
-          <Text style={styles.actionText}>Top Up</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="send" size={24} color="#0C051D" />
-          <Text style={styles.actionText}>Send</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="cash" size={24} color="#0C051D" />
-          <Text style={styles.actionText}>Request</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="time" size={24} color="#0C051D" />
-          <Text style={styles.actionText}>History</Text>
-        </TouchableOpacity>
-      </View>
+{/* Cards Section */}
+<View style={styles.cardsSection}>
+  {loading ? (
+<View style={styles.card}>
+  <Skeleton animation="pulse" width={80} height={40} />
+  <Skeleton
+    LinearGradientComponent={LinearGradient}
+    animation="wave"
+    width={80}
+    height={40}
+  />
+</View>
+  ) : cards.length === 0 ? (
+    <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
+    <Feather name="plus" size={32} color="#000" />
+  </TouchableOpacity>
+  ) : (
+    <FlatList
+      data={[...cards, { id: 'add' }]}  // Include the "Add Card" as part of the data
+      keyExtractor={(item) => item.id.toString()}  // Ensure unique key extraction
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      renderItem={({ item }) => {
+        if (item.id === 'add') {
+          // Add Card Button
+          return (
+            <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
+              <Feather name="plus" size={32} color="#000" />
+            </TouchableOpacity>
+          );
+        }
+        // Determine the icon to show based on the issuer
+        let issuerIcon;
+        if (item.issuer === "mastercard") {
+          issuerIcon = <FontAwesome6 name="cc-mastercard" size={24} color="black" />;
+        } else if (item.issuer === "visa") {
+          issuerIcon = <FontAwesome6 name="cc-visa" size={24} color="black" />;
+        } else {
+          issuerIcon = <MaterialCommunityIcons name="credit-card" size={24} color="black" />;
+        }
 
-     
-    {/* Cards Section */}
-    <View style={styles.cardsSection}>
-        <FlatList
-          data={[...cardsData, { id: 'add' }]} // Include an "Add" card
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => {
-            if (item.id === 'add') {
-              // Add Card
-              return (
-                <TouchableOpacity style={styles.addCard}  onPress={() => router.push("pages/newcard")}>
-                  <Feather name="plus" size={32} color="#000" />
-                </TouchableOpacity>
-              );
-            }
-            // Regular Cards with Gradient
-            return (
-              <LinearGradient
-                colors={item.colors}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardItem}
-              >
-                <Text style={styles.cardType}>{item.type}</Text>
-                  <View style={styles.infoRow}>
-                    <MaterialCommunityIcons name="integrated-circuit-chip" size={28} color="black" />
-                  </View>                
-                    <Text style={styles.cardBalance}>${item.balance}</Text>
-                <Text style={styles.cardAccount}>{item.account}</Text>
-                <FontAwesome6 name="cc-mastercard" size={24} style={{left:100}} color="black" />
-              </LinearGradient>
-            );
-          }}
-        />
-      </View>
+        // Determine which chip or wallet icon to show based on card type
+        const cardIcon = (item.type === 3 || item.type === 4) ? (
+          <MaterialCommunityIcons name="wallet" size={28} color="black" />
+        ) : (
+          <MaterialCommunityIcons name="integrated-circuit-chip" size={28} color="black" />
+        );
+
+        return (
+            <Link
+              href={{
+                pathname: '/pages/card/[id]',  // Correct relative path
+                params: { id: item.id },       // Pass the actual card id
+              }}
+            >
+          <LinearGradient                  
+            colors={["#fff",  item.color]}  // Colors as an array
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.cardItem}
+          >
+            <Text style={styles.cardType}>{item.name}</Text>
+            <View style={styles.infoRow}>
+              {cardIcon}  {/* Show the chip or wallet icon */}
+            </View>
+            <Text style={styles.cardBalance}>${item.balance}</Text>
+            <Text style={styles.cardAccount}>{item.bank}</Text>
+            {issuerIcon}  {/* Show the issuer's card icon */}
+          </LinearGradient>
+          </Link>
+        );
+      }}
+    />
+  )}
+</View>
 
        {/* Info Section */}
        <View style={styles.infoSection}>
@@ -233,7 +309,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#D6F6DD',
+    color: '#fff',
     fontFamily: "Medium", 
   },
   expenseSection: {
@@ -285,7 +361,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   actionButton: {
-    backgroundColor: "#A8DADC",
+    backgroundColor: "#DED8E3",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -293,7 +369,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 11,
-    fontFamily: "Regular",
+    fontFamily: "Medium",
     marginTop: 5,
     color: "#0C051D",
   },

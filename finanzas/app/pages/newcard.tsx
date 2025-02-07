@@ -1,19 +1,14 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Dimensions } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Dimensions, Alert, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome5 as FontAwesome6 } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { StyleSheet } from "react-native";
-import {Picker} from '@react-native-picker/picker';
-import { useFocusEffect } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
-import { setupDatabase } from "../../sqlite/database"; // Import the setup function
-import { Alert } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
+import { supabase } from "@/database/supabaseClient";
 
 export default function NewCard() {
   const router = useRouter();
-  const database = useSQLiteContext();
 
   const [cardDetails, setCardDetails] = useState({
     bank: "",
@@ -25,11 +20,9 @@ export default function NewCard() {
     issuer: "visa",
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      setupDatabase(database); // Ensure the table exists
-    }, [database])
-  );
+  const [cards, setCards] = useState<
+    { id: number; name: string; bank: string; ending: string; expiration: string }[]
+  >([]);
 
 
   const handleInputChange = (field, value) => {
@@ -37,10 +30,8 @@ export default function NewCard() {
     setCardDetails({ ...cardDetails, [field]: value });
   };
 
-  const colors = ["#3B82F6", "#9333EA", "#FACC15", "#14B8A6", "#F43F5E"];
-
+  const colors = ["#3B82F6", "#9333EA", "#FAE1FA", "#544CCA", "#00D09E", "#F43F5E", "#F1FE87"];
   const [selectedType, setSelectedType] = useState();
-
 
   const issuers = [
     { name: "visa", icon: "cc-visa" },
@@ -50,29 +41,93 @@ export default function NewCard() {
     { name: "other", icon: "wallet" },
   ];
 
-  const handleSave = async () => {
-    const { bank, name, ending, expiration, color, type, issuer } = cardDetails;
-    console.log(database, { bank, name, ending, expiration, color, type, issuer});
-    // Trim all values to remove extra spaces and ensure they are not empty
-    if ([bank, name, ending, expiration].some(field => !field.trim())) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-  
-    try {
-      await database.execAsync(
-        `INSERT INTO cards (bank, name, ending, expiration, color, type, issuer) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [bank.trim(), name.trim(), ending.trim(), expiration.trim(), color, type, issuer]
-      );
-  
-      Alert.alert("Success", "Card saved successfully!");
-      router.back();
-    } catch (error) {
-      console.error("Error saving card:", error);
-      Alert.alert("Error", "Something went wrong while saving the card.");
-    }
-  };
+          const handleSave = async () => {
+            const { bank, name, ending, expiration, color, type, issuer } = cardDetails;
+          
+            // Check if fields are filled
+            if ([bank, name, ending, expiration].some((field) => !field.trim())) {
+              Alert.alert('Error', 'Please fill in all fields.');
+              return;
+            }
+          
+            // Format expiration date from MM/YY to YYYY-MM-DD
+            const expirationDate = formatExpirationDate(expiration);
+          
+            if (!expirationDate) {
+              Alert.alert('Error', 'Invalid expiration date format.');
+              return;
+            }
+          
+            // Map card type string to integer value
+            const typeMap = {
+              debit: 1,   // example mapping
+              credit: 2,
+              wallet: 3,
+              other: 4,
+            };
+          
+            const cardType = typeMap[type];  // Convert string to integer
+          
+            if (!cardType) {
+              Alert.alert('Error', 'Invalid card type.');
+              return;
+            }
+          
+            try {
+              const { error } = await supabase.from('cards').insert([
+                {
+                  bank: bank.trim(),
+                  name: name.trim(),
+                  ending: ending.trim(),
+                  expiration: expirationDate,
+                  color,
+                  type: cardType,  // Send the integer type
+                  issuer,
+                  balance: '0',
+                  negative: '0',
+                },
+              ]);
+          
+              if (error) {
+                console.error('Error saving card:', error);
+                Alert.alert('Error', 'Something went wrong while saving the card.');
+              } else {
+                Alert.alert('Success', 'Card saved successfully!');
+                router.back();
+              }
+            } catch (error) {
+              console.error('Unexpected error saving card:', error);
+              Alert.alert('Error', 'Unexpected error occurred.');
+            }
+          };
+          
 
+  // Function to convert MM/YY format to YYYY-MM-DD format
+const formatExpirationDate = (expiration: string) => {
+  const [month, year] = expiration.split('/');
+
+  if (!month || !year || month.length !== 2 || year.length !== 2) {
+    return null; // Invalid date format
+  }
+
+  const fullYear = `20${year}`; // Convert YY to YYYY
+  const formattedDate = `${fullYear}-${month.padStart(2, '0')}-01`; // Set day as '01'
+
+  return formattedDate;
+};
+
+const handleExpirationChange = (value) => {
+  // Remove any non-numeric characters
+  const cleanedValue = value.replace(/\D/g, '');
+  let formattedValue = cleanedValue;
+  if (cleanedValue.length > 2) {
+    formattedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2, 4)}`;
+  }
+  // Update the cardDetails with the formatted expiration date
+  handleInputChange('expiration', formattedValue);
+};
+
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.backcard} />
@@ -109,15 +164,12 @@ export default function NewCard() {
       </LinearGradient>
 
       <View style={styles.form}>
-
-        
-        
         <Text style={styles.label}>Color</Text>
         <View style={styles.colorPicker}>
           {colors.map((color) => (
             <TouchableOpacity
               key={color}
-              style={[styles.colorCircle, { backgroundColor: color, borderWidth: cardDetails.color === color ? 3 : 0 }]}
+              style={[styles.colorCircle, { backgroundColor: color, borderWidth: cardDetails.color === color ? 3 : 0 , borderColor: "#fff" }]}
               onPress={() => handleInputChange("color", color)}
             />
           ))}
@@ -137,31 +189,32 @@ export default function NewCard() {
         </Picker>
         </View>
         <TextInput
-          placeholder="Nombre Tarjeta"
-          placeholderTextColor="#888"
+          placeholder="Nombre  de la Tarjeta"
+          placeholderTextColor="#fff"
           style={styles.input}
           onChangeText={(text) => handleInputChange("name", text)}
         />
         <TextInput
           placeholder="Banco"
-          placeholderTextColor="#888"
+          placeholderTextColor="#fff"
           style={styles.input}
           onChangeText={(text) => handleInputChange("bank", text)}
         />
         <View style={styles.row}>
         <TextInput
-            placeholder="Card Ending"
-            value={cardDetails.ending}
-            style={styles.input}
-            onChangeText={(value) => handleInputChange("ending", value)}
-            />
-
-            <TextInput
-            placeholder="Expiration Date (MM/YY)"
-            value={cardDetails.expiration}
-            style={styles.input}
-            onChangeText={(value) => handleInputChange("expiration", value)}
-            />
+          placeholder="Card Ending"
+          placeholderTextColor="#fff"
+          value={cardDetails.ending}
+          style={styles.input}
+          onChangeText={(value) => handleInputChange("ending", value)}
+          />
+          <TextInput
+          placeholder="Expiration Date (MM/YY)"
+          placeholderTextColor="#fff"
+          value={cardDetails.expiration}
+          style={styles.input}
+          onChangeText={handleExpirationChange}
+          />
         </View>
 
         <Text style={styles.label}>Issuer</Text>
