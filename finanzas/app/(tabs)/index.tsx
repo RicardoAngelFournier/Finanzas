@@ -23,6 +23,9 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Skeleton } from '@rneui/themed';
 import { Link } from 'expo-router';
+import  { createContext, useContext, useEffect } from 'react';
+
+const CardsContext = createContext(null);
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -38,11 +41,9 @@ export default function HomeScreen() {
 
   const [loading, setLoading] = useState(true); // Add loading state
 
-  useFocusEffect(
-    useCallback(() => {
-      loadCards(); // Fetch data when the screen is focused
-    }, [])
-  );
+  useEffect(() => {
+    loadCards();  // Fetch cards when the app loads
+  }, []);
 
   const loadCards = async () => {
     try {

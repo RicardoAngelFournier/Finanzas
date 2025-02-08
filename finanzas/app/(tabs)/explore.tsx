@@ -214,6 +214,7 @@ export default function Score() {
     </View>
   );
 }
+
 const { width, height } = Dimensions.get("window");
 
 
