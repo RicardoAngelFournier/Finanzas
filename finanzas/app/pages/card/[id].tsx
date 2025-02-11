@@ -9,7 +9,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/database/supabaseClient";  // Ensure you import your Supabase client
-
+import { Skeleton } from "@rneui/themed";
 
 export default function CardScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState("Enero"); // Default to "January"
@@ -25,35 +25,54 @@ export default function CardScreen() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+  
+      // Fetch card data
       const { data: card, error: cardError } = await supabase
         .from("cards")
         .select("*")
         .eq("id", id)
         .single();
-
+  
+      // Fetch transaction data
       const { data: transactionList, error: transactionError } = await supabase
         .from("transaction")
         .select("*")
         .eq("card", id)
         .order("date", { ascending: false });
-
-      if (cardError || transactionError) {
-        console.error("Error fetching data:", cardError || transactionError);
+  
+      // Fetch category data
+      const { data: categories, error: categoryError } = await supabase
+        .from("category")
+        .select("*");
+  
+      if (cardError || transactionError || categoryError) {
+        console.error("Error fetching data:", cardError || transactionError || categoryError);
       } else {
+        // Map category data to transactions
+        const transactionsWithCategory = transactionList.map((transaction) => {
+          const category = categories.find((cat) => cat.id === transaction.category);
+          return {
+            ...transaction,
+            categoryEmoji: category ? category.emoji : "❓", // Use fallback emoji if category not found
+          };
+        });
+  
         setCardData(card);
-        setTransactions(transactionList);
-        console.log(transactions)
+        setTransactions(transactionsWithCategory);
       }
+  
       setLoading(false);
     };
-
+  
     fetchData();
   }, [id]);
-
+  
   const renderTransactionItem = ({ item }) => (
     <View style={styles.transactionCard}>
       <View style={styles.iconContainer}>
-        <View style={styles.iconBackground} />
+        <View style={styles.iconBackground}>
+          <Text style={{ fontSize: 24 }}>{item.categoryEmoji}</Text>
+        </View>
       </View>
       <View style={styles.transactionDetails}>
         <Text style={styles.transactionTitle}>{item.name}</Text>
@@ -69,7 +88,41 @@ export default function CardScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
+        <View style={styles.backcard} />
+        <View style={styles.header}>
+          <LinearGradient
+            colors={["#DED8E3", "#DED8E3", "#DED8E3"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.cardContainer, { width: width - 20, marginHorizontal: 10 }]}
+          >
+            <Text style={styles.balanceAmount}>Cargando...</Text>
+            <View style={styles.cardTop}>
+              <View>
+                <MaterialCommunityIcons name="integrated-circuit-chip" size={32} color="white" />
+              </View>
+            </View>
+            <View style={styles.cardNumberSection}>
+              <Text style={styles.cardNumber}>cargando</Text>
+              <Text style={styles.cardNumber}>••••</Text>
+              <Text style={styles.cardNumber}>••••</Text>
+              <Text style={styles.cardNumber}>cargando</Text>
+            </View>
+            <View style={styles.cardBottom}>
+              <View>
+                <Text style={styles.cardNameLabel}>Name</Text>
+                <Text style={styles.cardName}>cargando</Text>
+              </View>
+              <View>
+                <Text style={styles.cardExpLabel}>Exp</Text>
+                <Text style={styles.cardExpDate}>cargando</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </View>
+        <View style={styles.transactionsList}>
+          <Skeleton animation="pulse" width={80} height={40} />
+        </View>
       </View>
     );
   }
@@ -87,11 +140,12 @@ export default function CardScreen() {
           scrollAnimationDuration={1000}
           onSnapToItem={(index) => setCurrentIndex(index)}
           pagingEnabled
+            
           renderItem={({ index }) => (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               {index === 0 ? (
                 <LinearGradient
-                  colors={["#DED8E3", "#F4989C", "#A8DADC"]}
+                  colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={[styles.cardContainer, { width: width - 20, marginHorizontal: 10 }]}
@@ -114,11 +168,11 @@ export default function CardScreen() {
                   <View style={styles.cardBottom}>
                     <View>
                       <Text style={styles.cardNameLabel}>Name</Text>
-                      <Text style={styles.cardName}>{cardData.owner_name}</Text>
+                      <Text style={styles.cardName}>{cardData.name}</Text>
                     </View>
                     <View>
                       <Text style={styles.cardExpLabel}>Exp</Text>
-                      <Text style={styles.cardExpDate}>{cardData.exp_date}</Text>
+                      <Text style={styles.cardExpDate}>{cardData.expiration}</Text>
                     </View>
                   </View>
                 </LinearGradient>
@@ -167,7 +221,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 30,
-    height: height * 0.34,    
+    height: height * 0.34,
     marginBottom: 10,
   },
   periodSelector: {
@@ -223,8 +277,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   iconBackground: {
-    height: 40,
-    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 45,
+    width: 45,
     backgroundColor: "#957FEF",
     borderRadius: 20,
   },

@@ -6,6 +6,7 @@ import { FlatList } from "react-native";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { ScrollView } from "react-native";
 
 export default function Score() {
     const progress = useRef(new Animated.Value(0)).current; // Animated value for the progress bar
@@ -15,18 +16,18 @@ export default function Score() {
 
     const scores = [
         {
-          id: "1",
-          type: "BBB",
-          date: "13 Enero",
-          time: "8:25 PM",
-          savings: "$15,000.00",
+            id: "1",
+            type: "BBB",
+            date: "13 Enero",
+            time: "8:25 PM",
+            savings: "$15,000.00",
         },
         {
-          id: "2",
-          type: "A+",
-          date: "16 Enero",
-          time: "12:56 PM",
-          amount: "-$15,200.00",
+            id: "2",
+            type: "A+",
+            date: "16 Enero",
+            time: "12:56 PM",
+            amount: "-$15,200.00",
         },
         {
             id: "3",
@@ -34,9 +35,9 @@ export default function Score() {
             date: "16 Enero",
             time: "12:56 PM",
             amount: "-$15,200.00",
-          },
-    
-      ];
+        },
+
+    ];
 
     useEffect(() => {
         // Calculate width percentage based on the score
@@ -54,20 +55,20 @@ export default function Score() {
         outputRange: ["0%", "100%"], // Corresponding width values
     });
 
-      const renderscores = ({ item }) => (
+    const renderscores = ({ item }) => (
         <View style={styles.transactionCard}>
-          <View style={styles.iconContainer}>
-            <Text style={styles.transactionTitle}>{item.type}</Text>
-          </View>
-          <View style={styles.transactionDetails}>
-            <Text style={styles.transactionTitle}>{item.date}</Text>
-            <Text style={styles.transactionSubtitle}>
-            {item.time}
-            </Text>
-          </View>
-          <Text style={styles.transactionAmount}>{item.amount}</Text>
+            <View style={styles.iconContainer}>
+                <Text style={styles.transactionTitle}>{item.type}</Text>
+            </View>
+            <View style={styles.transactionDetails}>
+                <Text style={styles.transactionTitle}>{item.date}</Text>
+                <Text style={styles.transactionSubtitle}>
+                    {item.time}
+                </Text>
+            </View>
+            <Text style={styles.transactionAmount}>{item.amount}</Text>
         </View>
-      );
+    );
 
     return (
         <View style={styles.container}>
@@ -76,116 +77,119 @@ export default function Score() {
 
             {/* Header Section */}
             <View style={styles.header}>
-                <Text style={styles.subtitle}>Current Score:</Text>
+                <Text style={styles.subtitle}>Score Actual:</Text>
                 <View style={styles.row2}>
-                    <Text style={{ fontFamily: "Bold", fontSize: 36, color: "#fff" }}>0.5</Text>
-                    <Text style={{ fontFamily: "Black", fontSize: 36, color: "#fff" }}>BBB</Text>
+                    <Text style={{ fontFamily: "Bold", fontSize: 38, color: "#fff" }}>0.853</Text>
+                    <Text style={{ fontFamily: "Black", fontSize: 38, color: "#fff" }}>BBB</Text>
                 </View>
                 <View style={styles.row2}>
-                    <Text style={styles.subtitle}>Siguiente registro en: 3 dias 15 horas 26 minutos</Text>
+                    <Text style={styles.subtitle2}>Siguiente registro en: 3 dias 15 horas 26 minutos</Text>
                 </View>
             </View>
 
 
-  <TouchableOpacity
-        onPress={() => router.push("/pages/infoscore")} // Navigate to the "score" screen
-      >
-            {/* Expense Section */}
-            <View style={styles.expenseSection}>
-                <View style={styles.row2}>
-                    <Text style={styles.subtitle}>Score anterior: 0.688</Text>
-                </View>
+            <TouchableOpacity
+                onPress={() => router.push("/pages/infoscore")} // Navigate to the "score" screen
+            >
+                {/* Expense Section */}
+                <View style={styles.expenseSection}>
+                    <View style={styles.row2}>
 
-                {/* Progress Bar */}
-                <View style={styles.progressBarContainer}>
-                    <Animated.View
-                        style={[
-                            styles.progressBar,
-                            { width: widthInterpolation }, // Animated width
-                        ]}
-                    />
-                </View>
+                        <Text style={styles.subtitle}>Score anterior: 0.688</Text>
+                        <View style={{ marginRight: 10 }}>
+                            <FontAwesome6 name="circle-chevron-right" size={24} color="white" />
+                        </View>
+                    </View>
 
-                {/* Labels under the Progress Bar */}
-                <View style={styles.labelsContainer}>
-                    <Text style={styles.label}>C−</Text>
-                    <Text style={styles.label}>B</Text>
-                    <Text style={styles.label2}>BB</Text>
-                    <Text style={styles.label}>A-</Text>
-                    <Text style={styles.label2}>A+</Text>
-                    <Text style={styles.label}>AAA</Text>
+                    {/* Progress Bar */}
+                    <View style={styles.progressBarContainer}>
+                        <Animated.View
+                            style={[
+                                styles.progressBar,
+                                { width: widthInterpolation }, // Animated width
+                            ]}
+                        />
+                    </View>
+
+                    {/* Labels under the Progress Bar */}
+                    <View style={styles.labelsContainer}>
+                        <Text style={styles.label}>C−</Text>
+                        <Text style={styles.label}>B</Text>
+                        <Text style={styles.label2}>BB</Text>
+                        <Text style={styles.label}>A-</Text>
+                        <Text style={styles.label2}>A+</Text>
+                        <Text style={styles.label}>AAA</Text>
+                    </View>
                 </View>
-            </View>
-        </TouchableOpacity>
-                    
+            </TouchableOpacity>
+
 
             <View style={styles.scores}>
-                <View style={styles.row}>
-                    <LinearGradient
-                        colors={['#DED8E3', '#9987A9']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="money-bill-wave" size={30} color="black" />
-                        <Text style={styles.cardType}>Spare</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
+                <ScrollView horizontal>
+                    <View style={styles.row}>
+                        <LinearGradient
+                            colors={['#DED8E3', '#9987A9']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.cardItem}
+                        >
+                            <FontAwesome6 name="money-bill-wave" size={30} color="black" />
+                            <Text style={styles.cardType}>Spare</Text>
+                            <Text style={styles.cardBalance}>0.81</Text>
+                        </LinearGradient>
 
-                    <LinearGradient
-                        colors={['#9987A9', '#DED8E3']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="credit-card" size={30} color="black" />
-                        <Text style={styles.cardType}>Deuda</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
-                </View>
+                        <LinearGradient
+                            colors={['#9987A9', '#DED8E3']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.cardItem}
+                        >
+                            <FontAwesome6 name="credit-card" size={30} color="black" />
+                            <Text style={styles.cardType}>Deuda</Text>
+                            <Text style={styles.cardBalance}>0.81</Text>
+                        </LinearGradient>
 
-                <View style={styles.row}>
-                    <LinearGradient
-                        colors={['#DED8E3', '#9987A9']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="circle-dollar-to-slot" size={30} color="black" />
-                        <Text style={styles.cardType}>Ahorro</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
+                        <LinearGradient
+                            colors={['#DED8E3', '#9987A9']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.cardItem}
+                        >
+                            <FontAwesome6 name="circle-dollar-to-slot" size={30} color="black" />
+                            <Text style={styles.cardType}>Ahorro</Text>
+                            <Text style={styles.cardBalance}>0.81</Text>
+                        </LinearGradient>
 
-                    <LinearGradient
-                        colors={['#9987A9', '#DED8E3']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.cardItem}
-                    >
-                        <FontAwesome6 name="sack-dollar" size={30} color="black" />
-                        <Text style={styles.cardType}>Ahorro</Text>
-                        <Text style={styles.cardBalance}>0.81</Text>
-                    </LinearGradient>
-                </View>
-
+                        <LinearGradient
+                            colors={['#9987A9', '#DED8E3']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.cardItem}
+                        >
+                            <FontAwesome6 name="sack-dollar" size={30} color="black" />
+                            <Text style={styles.cardType}>Ahorro</Text>
+                            <Text style={styles.cardBalance}>0.81</Text>
+                        </LinearGradient>
+                    </View>
+                </ScrollView>
             </View>
 
-        {/* Period Selector */}
-        <View style={styles.periodSelector}>
-        <Text style={styles.periodText}>{selectedPeriod}</Text>
-        <TouchableOpacity onPress={() => alert("Open Period Selector")}>
-            <Text style={styles.changePeriod}>Cambiar Periodo</Text>
-        </TouchableOpacity>
-        </View>
+            {/* Period Selector */}
+            <View style={styles.periodSelector}>
+                <Text style={styles.periodText}>{selectedPeriod}</Text>
+                <TouchableOpacity onPress={() => alert("Open Period Selector")}>
+                    <Text style={styles.changePeriod}>Cambiar Periodo</Text>
+                </TouchableOpacity>
+            </View>
 
-      {/* Transactions List */}
-      <FlatList
-        data={scores}
-        renderItem={renderscores}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.transactionsList}
-        ListHeaderComponent={<Text style={styles.listHeader}>Scores Recientes</Text>}
-      />
+            {/* Transactions List */}
+            <FlatList
+                data={scores}
+                renderItem={renderscores}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.transactionsList}
+                ListHeaderComponent={<Text style={styles.listHeader}>Scores Recientes</Text>}
+            />
 
         </View>
     );
@@ -219,9 +223,14 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     subtitle: {
-        fontSize: 14,
-        color: "#D6F6DD",
-        fontFamily: "Medium",
+        fontSize: 16,
+        color: "#fff",
+        fontFamily: "Regular",
+    },
+    subtitle2: {
+        fontSize: 12,
+        color: "#fff",
+        fontFamily: "Light",
     },
     row: {
         flexDirection: "row",
@@ -266,7 +275,7 @@ const styles = StyleSheet.create({
     },
     scores: {
         justifyContent: "space-around",
-        marginTop: 10,
+        marginTop: 15,
         marginBottom: 15,
     },
     cardItem: {
@@ -274,7 +283,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 12,
         justifyContent: 'space-between',
-        width: 140,
+        width: 120,
         margin: 5
     },
     cardType: {
@@ -299,59 +308,59 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginVertical: 10,
-      },
-      transactionCard: {
+    },
+    transactionCard: {
         flexDirection: "row",
         alignItems: "center",
         padding: 10,
         backgroundColor: "#E6E6E6",
         borderRadius: 10,
         marginBottom: 10,
-      },
-      iconContainer: {
+    },
+    iconContainer: {
         justifyContent: "center",
         alignItems: "center",
         marginRight: 10,
-      },
-      iconBackground: {
+    },
+    iconBackground: {
         height: 40,
         width: 40,
         backgroundColor: "#6DB6FE",
         borderRadius: 20,
-      },
-      transactionDetails: {
+    },
+    transactionDetails: {
         flex: 1,
-      },
-      transactionTitle: {
+    },
+    transactionTitle: {
         fontSize: 14,
         fontFamily: "Bold",
-      },
-      transactionSubtitle: {
+    },
+    transactionSubtitle: {
         fontSize: 12,
         fontFamily: "Light",
         color: "#0C051D",
-      },
-      transactionAmount: {
+    },
+    transactionAmount: {
         fontSize: 14,
         fontFamily: "Bold",
         color: "red",
-      },
-      periodSelector: {
+    },
+    periodSelector: {
         flexDirection: "row",
         paddingHorizontal: 16,
         justifyContent: "space-between",
-      },
-      periodText: {
+    },
+    periodText: {
         fontSize: 18,
         fontFamily: "Bold",
-      },
-      changePeriod: {
+    },
+    changePeriod: {
         fontSize: 14,
         color: "#957FEF",
         fontFamily: "Medium",
-      },
-      transactionsList: {
+    },
+    transactionsList: {
         paddingHorizontal: 16,
         paddingBottom: 16,
-      },
+    },
 });
