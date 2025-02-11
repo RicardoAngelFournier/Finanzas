@@ -3,87 +3,113 @@ import { StyleSheet, Image, FlatList, TouchableOpacity, View, Dimensions, Scroll
 import { Text } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/database/supabaseClient";  // Ensure you import your Supabase client
 import { Skeleton } from "@rneui/themed";
+import DateTimePicker from 'react-native-ui-datepicker';
+import dayjs from 'dayjs';
+import { Dialog } from "@rneui/themed";
 
 export default function CardScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState("Enero"); // Default to "January"
-  const animationHeight = useSharedValue(0); // Shared value for height
   const [currentIndex, setCurrentIndex] = useState(0); // Track current swipe index
   const [cardData, setCardData] = useState(null);
+  const [pieData, setPieData] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visible1, setVisible1] = useState(false);
+
+  const [date, setDate] = useState(dayjs());
 
   const router = useRouter();
   const { id } = useLocalSearchParams(); // Get the card ID from the route
 
+  const toggleDialog1 = () => {
+    setVisible1(!visible1);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-  
+
       // Fetch card data
-      const { data: card, error: cardError } = await supabase
-        .from("cards")
-        .select("*")
-        .eq("id", id)
-        .single();
-  
+      const { data: card, error: cardError } = await supabase.from("cards").select("*").eq("id", id).single();
+
       // Fetch transaction data
       const { data: transactionList, error: transactionError } = await supabase
         .from("transaction")
         .select("*")
         .eq("card", id)
         .order("date", { ascending: false });
-  
+
       // Fetch category data
-      const { data: categories, error: categoryError } = await supabase
-        .from("category")
-        .select("*");
-  
+      const { data: categories, error: categoryError } = await supabase.from("category").select("*");
+
       if (cardError || transactionError || categoryError) {
         console.error("Error fetching data:", cardError || transactionError || categoryError);
       } else {
+        setCardData(card);
+
         // Map category data to transactions
         const transactionsWithCategory = transactionList.map((transaction) => {
           const category = categories.find((cat) => cat.id === transaction.category);
           return {
             ...transaction,
-            categoryEmoji: category ? category.emoji : "❓", // Use fallback emoji if category not found
+            categoryEmoji: category ? category.emoji : "❓", // Fallback emoji if category not found
           };
         });
-  
-        setCardData(card);
+
         setTransactions(transactionsWithCategory);
+
+        // Calculate total spent per category for the pie chart
+        const categoryTotals = categories.map((category) => {
+          const total = transactionsWithCategory
+            .filter((transaction) => transaction.category === category.id)
+            .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+          return {
+            name: category.name,
+            value: total,
+            color: category.color || generateRandomColor(),
+            gradientCenterColor: category.color || "#FFFFFF",
+          };
+        });
+
+        setPieData(categoryTotals.filter((item) => item.value > 0)); // Remove categories with 0 value
       }
-  
+
       setLoading(false);
     };
-  
+
     fetchData();
   }, [id]);
+
+
+  // Helper function to generate a random color (optional)
+const generateRandomColor = () => {
+  return "#" + Math.floor(Math.random() * 16777215).toString(16);
+};
   
-  const renderTransactionItem = ({ item }) => (
-    <View style={styles.transactionCard}>
-      <View style={styles.iconContainer}>
-        <View style={styles.iconBackground}>
-          <Text style={{ fontSize: 24 }}>{item.categoryEmoji}</Text>
-        </View>
+const renderTransactionItem = ({ item }) => (
+  <View style={styles.transactionCard}>
+    <View style={styles.iconContainer}>
+      <View style={styles.iconBackground}>
+        <Text style={{ fontSize: 24 }}>{item.categoryEmoji}</Text>
       </View>
-      <View style={styles.transactionDetails}>
-        <Text style={styles.transactionTitle}>{item.name}</Text>
-        <Text style={styles.transactionSubtitle}>{item.type}</Text>
-        <Text style={styles.transactionSubtitle}>
-          {new Date(item.date).toLocaleDateString()} | {new Date(item.date).toLocaleTimeString()}
-        </Text>
-      </View>
-      <Text style={styles.transactionAmount}>${item.amount.toFixed(2)}</Text>
     </View>
-  );
+    <View style={styles.transactionDetails}>
+      <Text style={styles.transactionTitle}>{item.name}</Text>
+      <Text style={styles.transactionSubtitle}>{item.type}</Text>
+      <Text style={styles.transactionSubtitle}>
+        {new Date(item.date).toLocaleDateString()} | {new Date(item.date).toLocaleTimeString()}
+      </Text>
+    </View>
+    <Text style={styles.transactionAmount}>${item.amount.toFixed(2)}</Text>
+  </View>
+);
 
   if (loading) {
     return (
@@ -140,7 +166,6 @@ export default function CardScreen() {
           scrollAnimationDuration={1000}
           onSnapToItem={(index) => setCurrentIndex(index)}
           pagingEnabled
-            
           renderItem={({ index }) => (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               {index === 0 ? (
@@ -177,7 +202,41 @@ export default function CardScreen() {
                   </View>
                 </LinearGradient>
               ) : (
-                <Text>Other Carousel Content</Text>
+                <LinearGradient
+                colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.cardContainer}
+              >
+                <Text style={{ fontSize: 20, color: "white", fontFamily: "Bold" }}>
+                  {cardData.name}
+                </Text>
+                <View style={{ padding: 5, alignItems: "center" }}>
+                  <PieChart
+                    data={pieData}
+                    isAnimated
+                    donut
+                    showGradient
+                    sectionAutoFocus
+                    radius={80}
+                    innerRadius={50}
+                    innerCircleColor={"#232B5D"}
+                    centerLabelComponent={() => {
+                      const totalValue = pieData.reduce((sum, item) => sum + item.value, 0);
+                      return (
+                        <View style={{ justifyContent: "center", alignItems: "center" }}>
+                          <Text style={{ fontSize: 22, color: "white", fontFamily: "Regular" }}>
+                            {totalValue}
+                          </Text>
+                          <Text style={{ fontSize: 12, color: "white", fontFamily: "Regular" }}>
+                            Total
+                          </Text>
+                        </View>
+                      );
+                    }}
+                  />
+                </View>
+              </LinearGradient>
               )}
             </View>
           )}
@@ -186,10 +245,23 @@ export default function CardScreen() {
 
       <View style={styles.periodSelector}>
         <Text style={styles.periodText}>{selectedPeriod}</Text>
-        <TouchableOpacity onPress={() => alert("Open Period Selector")}>
+        <TouchableOpacity onPress={toggleDialog1}>
           <Text style={styles.changePeriod}>Cambiar Periodo</Text>
         </TouchableOpacity>
       </View>
+
+      <Dialog
+      isVisible={visible1}
+      onBackdropPress={toggleDialog1}
+    >
+      <Dialog.Title title="Dialog Title"/>
+      <DateTimePicker
+        mode="range"
+        initialView="month"
+        date={date}
+        onChange={(params) => setDate(params.date)}
+      />
+    </Dialog>
 
       <FlatList
         data={transactions}
