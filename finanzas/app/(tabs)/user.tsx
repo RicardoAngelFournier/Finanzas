@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     color: "#DED8E3",
   },
   balanceContainer: {
-    backgroundColor: "#DAC4F7",
+    backgroundColor: "#DED8E3",
     padding: 20,
     borderRadius: 15,
     alignItems: "center",

@@ -9,12 +9,11 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/database/supabaseClient";  // Ensure you import your Supabase client
 import { Skeleton } from "@rneui/themed";
-import DateTimePicker from 'react-native-ui-datepicker';
-import dayjs from 'dayjs';
 import { Dialog } from "@rneui/themed";
+import CustomDatePicker from "@/components/CalendarPicker";
+import dayjs from "dayjs";
 
 export default function CardScreen() {
-  const [selectedPeriod, setSelectedPeriod] = useState("Enero"); // Default to "January"
   const [currentIndex, setCurrentIndex] = useState(0); // Track current swipe index
   const [cardData, setCardData] = useState(null);
   const [pieData, setPieData] = useState(null);
@@ -22,10 +21,22 @@ export default function CardScreen() {
   const [loading, setLoading] = useState(true);
   const [visible1, setVisible1] = useState(false);
 
-  const [date, setDate] = useState(dayjs());
+  const [roundedValue, setRoundedValue] = useState(0); // State to store the rounded value
 
   const router = useRouter();
   const { id } = useLocalSearchParams(); // Get the card ID from the route
+
+  const [selectedDateRange, setSelectedDateRange] = useState({
+    startDate: dayjs().startOf('month').toDate(),
+    endDate: dayjs().endOf('month').toDate(),
+  });
+  
+  const filterTransactionsByDateRange = (transactions, startDate, endDate) => {
+    return transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.date);
+      return transactionDate >= startDate && transactionDate <= endDate;
+    });
+  };
 
   const toggleDialog1 = () => {
     setVisible1(!visible1);
@@ -34,69 +45,75 @@ export default function CardScreen() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
-      // Fetch card data
+  
       const { data: card, error: cardError } = await supabase.from("cards").select("*").eq("id", id).single();
-
-      // Fetch transaction data
       const { data: transactionList, error: transactionError } = await supabase
         .from("transaction")
         .select("*")
         .eq("card", id)
         .order("date", { ascending: false });
-
-      // Fetch category data
       const { data: categories, error: categoryError } = await supabase.from("category").select("*");
-
+  
       if (cardError || transactionError || categoryError) {
         console.error("Error fetching data:", cardError || transactionError || categoryError);
       } else {
         setCardData(card);
-
-        // Map category data to transactions
-        const transactionsWithCategory = transactionList.map((transaction) => {
+  
+        const filteredTransactions = filterTransactionsByDateRange(
+          transactionList,
+          selectedDateRange.startDate,
+          selectedDateRange.endDate
+        );
+  
+        const transactionsWithCategory = filteredTransactions.map((transaction) => {
           const category = categories.find((cat) => cat.id === transaction.category);
           return {
             ...transaction,
-            categoryEmoji: category ? category.emoji : "❓", // Fallback emoji if category not found
+            categoryEmoji: category ? category.emoji : "❓",
+            categoryColor: category ? category.color : "#DED8E3",
           };
         });
-
+  
         setTransactions(transactionsWithCategory);
-
-        // Calculate total spent per category for the pie chart
+  
         const categoryTotals = categories.map((category) => {
           const total = transactionsWithCategory
             .filter((transaction) => transaction.category === category.id)
             .reduce((sum, transaction) => sum + transaction.amount, 0);
-
+  
           return {
             name: category.name,
             value: total,
             color: category.color || generateRandomColor(),
-            gradientCenterColor: category.color || "#FFFFFF",
           };
         });
-
-        setPieData(categoryTotals.filter((item) => item.value > 0)); // Remove categories with 0 value
+  
+        setPieData(categoryTotals.filter((item) => item.value > 0));
       }
-
+  
       setLoading(false);
     };
-
+  
     fetchData();
-  }, [id]);
+  }, [id, selectedDateRange]); // Add selectedDateRange as a dependency
 
 
   // Helper function to generate a random color (optional)
 const generateRandomColor = () => {
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 };
+
+const handleDateChange = (newRange: { startDate: DateType; endDate: DateType }) => {
+  if (newRange.startDate && newRange.endDate) {
+    setSelectedDateRange(newRange);
+    toggleDialog1(); // Close the dialog after selecting a valid range
+  }
+};
   
 const renderTransactionItem = ({ item }) => (
   <View style={styles.transactionCard}>
     <View style={styles.iconContainer}>
-      <View style={styles.iconBackground}>
+      <View style={[styles.iconBackground, { backgroundColor: item.categoryColor }]}>
         <Text style={{ fontSize: 24 }}>{item.categoryEmoji}</Text>
       </View>
     </View>
@@ -159,109 +176,141 @@ const renderTransactionItem = ({ item }) => (
 
       {/* Header Section */}
       <View style={styles.header}>
-        <Carousel
-          width={width}
-          height={width / 1.5}
-          data={[{ type: "renderCard" }, { type: "graphSection" }, { type: "swipeableCard" }]} // Three slides
-          scrollAnimationDuration={1000}
-          onSnapToItem={(index) => setCurrentIndex(index)}
-          pagingEnabled
-          renderItem={({ index }) => (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              {index === 0 ? (
-                <LinearGradient
-                  colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={[styles.cardContainer, { width: width - 20, marginHorizontal: 10 }]}
-                >
-                  <View style={styles.cardTop}>
-                    <View>
-                      <Text style={styles.totalBalanceText}>{cardData.name}</Text>
-                      <Text style={styles.balanceAmount}>${cardData.balance.toFixed(2)}</Text>
-                    </View>
-                    <View>
-                      <MaterialCommunityIcons name="integrated-circuit-chip" size={32} color="white" />
-                    </View>
-                  </View>
-                  <View style={styles.cardNumberSection}>
-                    <Text style={styles.cardNumber}>{cardData.ending.slice(0, 4)}</Text>
-                    <Text style={styles.cardNumber}>••••</Text>
-                    <Text style={styles.cardNumber}>••••</Text>
-                    <Text style={styles.cardNumber}>{cardData.ending.slice(-4)}</Text>
-                  </View>
-                  <View style={styles.cardBottom}>
-                    <View>
-                      <Text style={styles.cardNameLabel}>Name</Text>
-                      <Text style={styles.cardName}>{cardData.name}</Text>
-                    </View>
-                    <View>
-                      <Text style={styles.cardExpLabel}>Exp</Text>
-                      <Text style={styles.cardExpDate}>{cardData.expiration}</Text>
-                    </View>
-                  </View>
-                </LinearGradient>
-              ) : (
-                <LinearGradient
-                colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardContainer}
-              >
-                <Text style={{ fontSize: 20, color: "white", fontFamily: "Bold" }}>
-                  {cardData.name}
-                </Text>
-                <View style={{ padding: 5, alignItems: "center" }}>
-                  <PieChart
-                    data={pieData}
-                    isAnimated
-                    donut
-                    showGradient
-                    sectionAutoFocus
-                    radius={80}
-                    innerRadius={50}
-                    innerCircleColor={"#232B5D"}
-                    centerLabelComponent={() => {
-                      const totalValue = pieData.reduce((sum, item) => sum + item.value, 0);
-                      return (
-                        <View style={{ justifyContent: "center", alignItems: "center" }}>
-                          <Text style={{ fontSize: 22, color: "white", fontFamily: "Regular" }}>
-                            {totalValue}
-                          </Text>
-                          <Text style={{ fontSize: 12, color: "white", fontFamily: "Regular" }}>
-                            Total
-                          </Text>
-                        </View>
-                      );
-                    }}
-                  />
-                </View>
-              </LinearGradient>
-              )}
+      <Carousel
+  width={width}
+  height={width / 1.4}
+  data={[{ type: "renderCard" }, { type: "graphSection" }, { type: "swipeableCard" }]} // Three slides
+  scrollAnimationDuration={1000}
+  onSnapToItem={(index) => setCurrentIndex(index)}
+  pagingEnabled
+  renderItem={({ item, index }) => (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      {item.type === "renderCard" ? (
+        <LinearGradient
+          colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.cardContainer, { width: width - 20, marginHorizontal: 10 }]}
+        >
+          <View style={styles.cardTop}>
+            <View>
+              <Text style={styles.totalBalanceText}>{cardData.name}</Text>
+              <Text style={styles.balanceAmount}>${cardData.balance.toFixed(2)}</Text>
             </View>
-          )}
-        />
+            <View>
+              <MaterialCommunityIcons name="integrated-circuit-chip" size={32} color="white" />
+            </View>
+          </View>
+          <View style={styles.cardNumberSection}>
+            <Text style={styles.cardNumber}>{cardData.ending.slice(0, 4)}</Text>
+            <Text style={styles.cardNumber}>••••</Text>
+            <Text style={styles.cardNumber}>••••</Text>
+            <Text style={styles.cardNumber}>{cardData.ending.slice(-4)}</Text>
+          </View>
+          <View style={styles.cardBottom}>
+            <View>
+              <Text style={styles.cardNameLabel}>Name</Text>
+              <Text style={styles.cardName}>{cardData.name}</Text>
+            </View>
+            <View>
+              <Text style={styles.cardExpLabel}>Exp</Text>
+              <Text style={styles.cardExpDate}>{cardData.expiration}</Text>
+            </View>
+          </View>
+        </LinearGradient>
+      ) : item.type === "graphSection" ? (
+        <LinearGradient
+          colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.cardContainer}
+        >
+          <Text style={{ fontSize: 20, color: "white", fontFamily: "Bold" }}>
+            {cardData.name}
+          </Text>
+          <View style={{ padding: 5, alignItems: "center" }}>
+            <PieChart
+              data={pieData}
+              isAnimated
+              donut
+              showGradient
+              sectionAutoFocus
+              radius={90}
+              innerRadius={50}
+              innerCircleColor={"#232B5D"}
+              centerLabelComponent={() => {
+                const totalValue = pieData.reduce((sum, item) => sum + item.value, 0);
+                const roundedValue = Math.round(totalValue);
+                setRoundedValue(roundedValue);
+                return (
+                  <View style={{ justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 22, color: "white", fontFamily: "Regular" }}>
+                      {roundedValue}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: "white", fontFamily: "Regular" }}>
+                      Total
+                    </Text>
+                  </View>
+                );
+              }}
+            />
+          </View>
+        </LinearGradient>
+      ) : (
+        <LinearGradient
+          colors={["#DED8E3", cardData.color || "#FFFFFF", "#A8DADC"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.cardContainer, { width: width - 20, marginHorizontal: 10 }]}
+        >
+          <Text style={styles.detailText}>
+            Tarjeta de <Text style={{ fontFamily: "Medium" }}>{cardData.tipo}</Text>
+          </Text>
+          <Text style={styles.detailText}>
+            Uso total del periodo: <Text style={{ fontFamily: "Bold" }}>${roundedValue}</Text>
+          </Text>
+          <Text style={styles.detailText}>
+            Limite: <Text style={{ fontFamily: "Bold" }}>$11,580.00</Text>
+          </Text>
+          <Text style={styles.detailText}>
+            Pendiente por pagar: <Text style={{ fontFamily: "Bold" }}>${cardData.negative}</Text>
+          </Text>
+          <Text style={styles.detailText}>
+            Fecha de Corte: <Text style={{ fontFamily: "Bold" }}>20/Enero</Text>
+          </Text>
+        </LinearGradient>
+      )}
+    </View>
+  )}
+/>
       </View>
 
       <View style={styles.periodSelector}>
-        <Text style={styles.periodText}>{selectedPeriod}</Text>
-        <TouchableOpacity onPress={toggleDialog1}>
-          <Text style={styles.changePeriod}>Cambiar Periodo</Text>
-        </TouchableOpacity>
+          <Text style={styles.periodText}>
+            {dayjs(selectedDateRange.startDate).format("DD MMM YYYY")} - {dayjs(selectedDateRange.endDate).format("DD MMM YYYY")}
+          </Text>
+          <TouchableOpacity onPress={toggleDialog1}>
+            <Text style={styles.changePeriod}>Cambiar Periodo</Text>
+          </TouchableOpacity>
+
+        <Dialog
+          isVisible={visible1}
+          onBackdropPress={toggleDialog1}
+          overlayStyle={{
+            position: "absolute",
+            width: "90%",
+          }}
+        >
+          <Dialog.Title title="Seleccionar Fecha" />
+          <CustomDatePicker
+                date={selectedDateRange}
+                onDateChange={handleDateChange}
+                mode="range"
+              />
+        </Dialog>
+
       </View>
 
-      <Dialog
-      isVisible={visible1}
-      onBackdropPress={toggleDialog1}
-    >
-      <Dialog.Title title="Dialog Title"/>
-      <DateTimePicker
-        mode="range"
-        initialView="month"
-        date={date}
-        onChange={(params) => setDate(params.date)}
-      />
-    </Dialog>
 
       <FlatList
         data={transactions}
@@ -270,6 +319,7 @@ const renderTransactionItem = ({ item }) => (
         contentContainerStyle={styles.transactionsList}
         ListHeaderComponent={<Text style={styles.listHeader}>Transacciones Recientes</Text>}
       />
+      
     </View>
   );
 }
@@ -279,7 +329,7 @@ const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#DED8E3",
+    backgroundColor: "#fff",
   },
   backcard: {
     position: "absolute",
@@ -287,12 +337,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: height * 0.35,
-    backgroundColor: "#0C051D",
+    backgroundColor: "#E6E8FF",
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
   header: {
-    marginTop: 30,
+    marginTop: 24,
     height: height * 0.34,
     marginBottom: 10,
   },
@@ -300,9 +350,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 16,
     justifyContent: "space-between",
+    padding: 5, 
+    backgroundColor: "#E6E8FF",
+    borderColor: "#DED8E3",
+    borderWidth: 2
   },
   periodText: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Bold",
   },
   changePeriod: {
@@ -339,9 +393,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#FAFAFF",
     borderRadius: 10,
     marginBottom: 10,
+    borderColor: "#DED8E3",
+    borderWidth: 2
   },
   iconContainer: {
     justifyContent: "center",
@@ -353,7 +409,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 45,
     width: 45,
-    backgroundColor: "#957FEF",
     borderRadius: 20,
   },
   transactionDetails: {
@@ -367,11 +422,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Light",
     color: "gray",
+    
   },
   transactionAmount: {
     fontSize: 14,
     fontFamily: "Bold",
-    color: "red",
+    color: "#CF2839",
   },
   cardContainer: {
     borderRadius: 18,

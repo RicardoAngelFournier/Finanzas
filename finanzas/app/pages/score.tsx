@@ -20,23 +20,29 @@ export default function Score() {
             type: "BBB",
             date: "13 Enero",
             time: "8:25 PM",
-            savings: "$15,000.00",
+            result: "Degradado ",
         },
         {
             id: "2",
             type: "A+",
             date: "16 Enero",
             time: "12:56 PM",
-            amount: "-$15,200.00",
+            result: "Afirmado",
         },
         {
             id: "3",
             type: "A+",
             date: "16 Enero",
             time: "12:56 PM",
-            amount: "-$15,200.00",
+            result: "Mejorado",
         },
-
+        {
+            id: "4",
+            type: "A",
+            date: "16 Enero",
+            time: "12:56 PM",
+            result: "Afirmado",
+        },
     ];
 
     useEffect(() => {
@@ -61,12 +67,12 @@ export default function Score() {
                 <Text style={styles.transactionTitle}>{item.type}</Text>
             </View>
             <View style={styles.transactionDetails}>
-                <Text style={styles.transactionTitle}>{item.date}</Text>
+                <Text style={styles.transactionDetails}>{item.date}</Text>
                 <Text style={styles.transactionSubtitle}>
                     {item.time}
                 </Text>
             </View>
-            <Text style={styles.transactionAmount}>{item.amount}</Text>
+            <Text style={styles.transactionAmount}>{item.result}</Text>
         </View>
     );
 
@@ -320,7 +326,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         justifyContent: "center",
         alignItems: "center",
-        marginRight: 10,
+        marginRight: 15,
     },
     iconBackground: {
         height: 40,
@@ -330,9 +336,11 @@ const styles = StyleSheet.create({
     },
     transactionDetails: {
         flex: 1,
+        fontFamily: "Regular",
+        fontSize: 14,
     },
     transactionTitle: {
-        fontSize: 14,
+        fontSize: 20,
         fontFamily: "Bold",
     },
     transactionSubtitle: {

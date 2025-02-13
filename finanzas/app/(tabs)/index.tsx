@@ -76,7 +76,7 @@ export default function HomeScreen() {
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.row3}>
-          <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#DAC4F7"}} >ENERO 2025</Text>
+          <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#9B7EDE"}} >ENERO 2025</Text>
           <Avatar
             size={32}
             rounded
@@ -103,7 +103,6 @@ export default function HomeScreen() {
           <View style={styles.progressBar} />
         </View>
         <View style={styles.row2}>
-          <FontAwesome6 name="check-circle" size={15} color={"#DED8E3"}  />
           <Text style={styles.percentageText}> 30% of Your Expenses, Looks Good.</Text>
         </View>
       </View>
@@ -113,19 +112,19 @@ export default function HomeScreen() {
         {/* Action Buttons */}
         <View style={[styles.actionsContainer, { marginTop: 0 }]}>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="wallet" size={24} color="#0C051D" />
+            <Ionicons name="wallet" size={24} color="#273469" />
             <Text style={styles.actionText}>+ Ahorro</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="send" size={24} color="#0C051D" />
+            <Ionicons name="send" size={24} color="#273469" />
             <Text style={styles.actionText}>Send</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="cash" size={24} color="#0C051D" />
+            <Ionicons name="cash" size={24} color="#273469" />
             <Text style={styles.actionText}>Request</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={() => router.push("pages/cardstest")}>
-            <Ionicons name="time" size={24} color="#0C051D" />
+            <Ionicons name="time" size={24} color="#273469" />
             <Text style={styles.actionText}>History</Text>
           </TouchableOpacity>
         </View>
@@ -186,13 +185,13 @@ export default function HomeScreen() {
               }}
             >
           <LinearGradient                  
-            colors={["#fff",  item.color]}  // Colors as an array
+            colors={["#fff",  item.color, "#A8DADC"]}  // Colors as an array
             start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+            end={{ x: 1., y: 1.2 }}
             style={styles.cardItem}
           >
+            <View style={styles.row3}>
             <Text style={styles.cardType}>{item.name}</Text>
-            <View style={styles.infoRow}>
               {cardIcon}  {/* Show the chip or wallet icon */}
             </View>
             <Text style={styles.cardBalance}>${item.balance}</Text>
@@ -242,7 +241,7 @@ export default function HomeScreen() {
       >
       <View style={styles.footer}>
       {/* Blurred Background Letters */}
-        <BlurView intensity={30} tint="default" style={styles.blurredTextContainer}>
+        <BlurView intensity={30} tint="default"  style={styles.blurredTextContainer}>
           <Text style={styles.blurredText}>BB</Text>
         </BlurView>
 
@@ -295,22 +294,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: height * 0.35,
-    backgroundColor: '#0C051D',
+    backgroundColor: '#E6E8FF',
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
   header: {
     marginTop: 40,
-    color: '#fff',
+    color: '#000',
     marginBottom: 20,
   },
   title: {
     fontSize: 26,
-    color: '#fff',
+    color: '#000',
   },
   subtitle: {
     fontSize: 16,
-    color: '#fff',
+    color: '#000',
     fontFamily: "Medium", 
   },
   expenseSection: {
@@ -332,29 +331,29 @@ const styles = StyleSheet.create({
   expenseText: {
     fontSize: 24,
     fontFamily: "Bold",
-    color: '#fff',
+    color: '#000',
   },
   debtText: {
     fontSize: 24,
     fontFamily: "Bold",
-    color: '#F4989C',
+    color: '#D72638',
   },
   progressBarContainer: {
-    height: 10,
+    height: 15,
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 20,
     overflow: 'hidden',
     marginVertical: 15,
   },
   progressBar: {
     width: '70%',
     height: '100%',
-    backgroundColor: '#957FEF',
+    backgroundColor: '#9B7EDE',
   },
   percentageText: {
     fontSize: 14,
     fontFamily: "Medium",
-    color: '#fff',
+    color: '#000',
   },
   actionsContainer: {
     flexDirection: "row",
@@ -362,17 +361,19 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   actionButton: {
-    backgroundColor: "#DED8E3",
+    backgroundColor: "#FAFAFF",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: "center",
     width: 80,
+    borderColor: "#DED8E3",
+    borderWidth: 2
   },
   actionText: {
     fontSize: 11,
     fontFamily: "Medium",
     marginTop: 5,
-    color: "#0C051D",
+    color: "#273469",
   },
   infoSection: {
     flexDirection: 'row',
@@ -383,9 +384,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: width - 32,
-    backgroundColor: '#DED8E3',
-    borderRadius: 28,
+    backgroundColor: '#FAFAFF',
+    borderRadius: 20,
     padding: 16,
+    borderColor: "#DED8E3",
+    borderWidth: 2
   },
   leftSection: {
     alignItems: 'center',
@@ -395,7 +398,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#A8DADC',
+    backgroundColor: '#9B7EDE',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -411,7 +414,7 @@ const styles = StyleSheet.create({
   divider: {
     width: 2,
     height: '90%',
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     marginHorizontal: 16,
   },
   divider2: {
@@ -432,18 +435,18 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 14,
     fontFamily: "Medium",
-    color: '#052224',
+    color: '#22333B',
     marginLeft: 8,
   },
   infoValue: {
     fontSize: 16,
-    color: '#052224',
+    color: '#22333B',
     fontFamily: "Medium",
     marginLeft: 'auto',
   },
   infoValueNegative: {
     fontSize: 16,
-    color: '#F56F6C',
+    color: '#D72638',
     fontFamily: "Medium",
     marginLeft: 'auto',
   },
@@ -454,7 +457,7 @@ const styles = StyleSheet.create({
   cardItem: {
     width: cardWidth,
     height: 150,
-    borderRadius: 18,
+    borderRadius: 20,
     padding: 12,
     marginRight: 16,
     justifyContent: 'space-between',
@@ -482,7 +485,7 @@ const styles = StyleSheet.create({
   addCard: {
     width: cardWidth,
     height: 150,
-    borderRadius: 16,
+    borderRadius: 20,
     borderStyle: 'dotted',
     borderWidth: 2,
     borderColor: '#000',
@@ -491,8 +494,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: "10",
-    backgroundColor: '#0C051D',
-    borderRadius: 16,
+    backgroundColor: '#FAFAFF',
+    borderRadius: 20,
     padding: 15,
     overflow: 'hidden', // Ensures no overflow outside the card
     borderColor: "#DED8E3",
@@ -512,18 +515,18 @@ const styles = StyleSheet.create({
     fontSize: 120,
     fontFamily: "Bold",
     color: '#957FEF',
-    opacity: 0.90,
+    opacity: 0.80,
     transform: [{ rotate: '-15deg' }], // Add rotation if needed
   },
   footerText: {
     fontSize: 32,
     alignSelf: "flex-start",
     fontFamily: "SemiBold",
-    color: '#E6E8FF',
+    color: '#22333B',
   },
   footerDescription: {
     fontSize: 13,
-    color: '#E6E8FF',
+    color: '#22333B',
     alignSelf: "flex-start",
     fontFamily: "Regular",
     textAlign: 'justify',
@@ -534,7 +537,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#DED8E3',
-    borderRadius: 16,
+    borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginTop: 20,
