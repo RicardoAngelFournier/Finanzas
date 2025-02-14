@@ -1,70 +1,97 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, Animated, Dimensions, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, StyleSheet, Animated, Dimensions, Pressable, FlatList, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { LineChart } from "react-native-gifted-charts";
-import { FlatList } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { supabase } from "@/database/supabaseClient"; //query with this
+import { useEffect } from "react";
 
 export default function Score() {
-  const currentSavings = 16000;
-  const [selectedMonth, setSelectedMonth] = useState(0);
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const tabTranslateX = useRef(new Animated.Value(0)).current;
+  const [savingsData, setSavingsData] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [totalSavings, setTotalSavings] = useState(0);
+  const [withdrawalsTotal, setWithdrawalsTotal] = useState(0);
 
-  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"];
-  const tabWidth = (width * 0.9) / months.length; // Ensure tab stays within bounds
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => currentYear - i); // Only past and current years
 
-  // Data Sets (Both always shown)
-  const data1 = [
-    { value: 15500 }, { value: 16600 }, { value: 17600 },
-    { value: 16880 }, { value: 16660 }, { value: 17600 }, { value: 18600 } , { value: 18600 }
-  ];
-  const data2 = [
-    { value: 14200 }, { value: 15200 }, { value: 16200 },
-    { value: 17200 }, { value: 18200 }, { value: 19200 }, { value: 20200 } , { value: 18600 } , { value: 18600 }
-  ];
+  useEffect(() => {
+    fetchSavingsData();
+  }, []);
 
-  const savingData = [
-    {
-      id: "1",
-      type: "Ingreso",
-      date: "13 Enero",
-      time: "8:25 PM",
-      amount: "$4,000.00",
-    },
-    {
-      id: "2",
-      type: "Ingreso",
-      date: "16 Enero",
-      time: "12:56 PM",
-      amount: "$1,200.00",
-    },
-    {
-      id: "3",
-      type: "Retiro",
-      date: "18 Enero",
-      time: "11:56 AM",
-      amount: "-$300.00",
-    },
-    {
-      id: "4",
-      type: "Retiro",
-      date: "18 Enero",
-      time: "11:56 AM",
-      amount: "-$300.00",
-    },
-  ];
+      const fetchSavingsData = async () => {
+        setRefreshing(true);
+        const { data, error } = await supabase
+          .from("savings")
+          .select("date, amount, total")
+          .order("date", { ascending: true });
+      
+        if (error) {
+          console.error(error);
+        } else {
+          const chartData = data.map((item) => ({
+            value: item.total, // Using 'total' for the chart
+            date: item.date
+          }));
+          
+          console.log("data",data); 
+          
+          if (data.length > 0) {
+            setSavingsData(data.reverse()); // Keep the FlatList in the original order
+            setTransactions(data); // Keep the FlatList in the original order
+            setTotalSavings(data.reverse()[data.length - 1].total); // Get the last total
+            setWithdrawalsTotal(calculateWithdrawals(data)); // Store the total withdrawals in state
+            
+          }
+        }
+        setRefreshing(false);
+      };
 
-  // Handle Tab Change Animation
-  const handleTabPress = (index) => {
-    setSelectedMonth(index);
-    Animated.spring(tabTranslateX, {
-      toValue: tabWidth * index, // Adjusted to keep within bounds
-      useNativeDriver: true,
-    }).start();
-  };
+      const filteredData = savingsData.filter((item) => {
+        const itemDate = new Date(item.date);
+        return itemDate.getMonth() === selectedMonth && itemDate.getFullYear() === selectedYear;
+      });
+    
+      useEffect(() => {
+        if (filteredData.length > 0) {
+          setTotalSavings(filteredData[filteredData.length - 1].total);
+          setWithdrawalsTotal(filteredData.reduce((sum, item) => sum + (item.amount < 0 ? Math.abs(item.amount) : 0), 0));
+        } else {
+          setTotalSavings(0);
+          setWithdrawalsTotal(0);
+        }
+      }, [selectedMonth, selectedYear, savingsData]);
+
+    const chartData = savingsData.map((entry) => ({ value: entry.total}));
+
+    const calculateWithdrawals = (data) => {
+      return data
+        .filter((item) => item.amount < 0)
+        .reduce((sum, item) => sum + Math.abs(item.amount), 0); // Sum the absolute value of all negative amounts
+    };
+    
+
+    // Handle Tab Change Animation
+    const handleTabPress = (index) => {
+      setSelectedMonth(index);
+      Animated.spring(tabTranslateX, {
+        toValue: tabWidth * index, // Adjusted to keep within bounds
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const onRefresh = async () => {
+      setRefreshing(true);
+      await fetchSavingsData(); // Refresh the data
+      setRefreshing(false);
+    };
 
     const renderSavings = ({ item }) => (
       <View style={styles.transactionCard}>
@@ -92,8 +119,9 @@ export default function Score() {
           <Text style={styles.subtitle}>Ahorro:</Text>
           <View style={styles.row2}>
             <Text style={{ fontFamily: "ExtraBold", fontSize: 38, color: "#ffffff" }}>
-              $ {currentSavings} MXN 
+            $ {totalSavings} MXN
             </Text>
+
           </View>
         </View>
       </TouchableOpacity>
@@ -101,16 +129,16 @@ export default function Score() {
       {/* Graph */}
       <View style={{ marginTop: 15 }}>
         <LineChart
-          yAxisOffset={13000}
-          maxValue={7000}
+          yAxisOffset={1}
           height={height * 0.25}
           width={width}
           areaChart
-          isAnimated
           animateOnDataChange
+          animationDuration={1000}
+          animationEasing={20}
           curved
-          data={data1} // Always show both datasets
-          data2={data2}
+          data={chartData} 
+          maxValue={totalSavings*1.2}
           spacing={60}
           color1="#B78AFF"
           color2="#A8DADC"
@@ -119,77 +147,79 @@ export default function Score() {
           endFillColor1="#B78AFF"
           endFillColor2="#A8DADC"
           startOpacity={0.9}
-          endOpacity={0.2}
+          endOpacity={0.1}
           initialSpacing={0}
-          noOfSections={5}
-          yAxisColor="white"
-          yAxisThickness={0}
+          noOfSections={4}
           hideYAxisText
+          dataPointsColor1="white"
+          dataPointsRadius1={5}
           pointerConfig={{
             pointerStripUptoDataPoint: true,
-            pointerStripColor: 'lightgray',
-            pointerStripWidth: 2,
+            pointerStripColor: 'white',
+            pointerStripWidth: 5,
             strokeDashArray: [2, 5],
-            pointerColor: 'lightgray',
+            pointerColor: 'white',
             radius: 4,
             pointerLabelWidth: 100,
             pointerLabelHeight: 120,
-            pointerLabelComponent: items => {
-              return (
-                <View
-                  style={{
-                    height: 120,
-                    width: 100,
-                    backgroundColor: '#0C051D',
-                    borderRadius: 4,
-                    justifyContent:'center',
-                    paddingLeft:16,
-                  }}>
-                  <Text style={{color: 'lightgray',fontSize:12}}>Actual</Text>
-                  <Text style={{color: 'white', fontWeight:'bold'}}>{items[0].value}</Text>
-                  <Text style={{color: 'lightgray',fontSize:12,marginTop:12}}>Target 40%</Text>
-                  <Text style={{color: 'white', fontWeight:'bold'}}>{items[1].value}</Text>
-                </View>
-              );
-            },
+            pointerLabelComponent: items => (
+              <View style={{ height: 90, width: 100, backgroundColor: '#0C051D', borderRadius: 4, justifyContent: 'center', paddingLeft: 16 }}>
+                <Text style={{ color: 'lightgray', fontSize: 12 }}>Actual</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>{items[0].total}</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>{items[0].date}</Text>
+              </View>
+            ),
           }}
         />
       </View>
 
       {/* Capsule Tab Bar */}
       <View style={styles.tabBarContainer}>
-        <View style={styles.tabBar}>
-          <Animated.View style={[styles.tabIndicator, { width: tabWidth - 10, transform: [{ translateX: tabTranslateX }] }]} />
+      <View style={styles.tabBar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
           {months.map((month, index) => (
-            <Pressable key={index} style={styles.tabButton} onPress={() => handleTabPress(index)}>
-              <Text style={[styles.tabText, selectedMonth === index && { color: "black" }]}>{month}</Text>
+            <Pressable key={index} style={styles.tabButton} onPress={() => setSelectedMonth(index)}>
+              <Text style={[styles.tabText, selectedMonth === index && { color: "#B78AFF" }]}>{month}</Text>
             </Pressable>
           ))}
+        </ScrollView>
         </View>
+
+        <View style={styles.tabBar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {years.map((year) => (
+            <Pressable key={year} style={styles.tabButton} onPress={() => setSelectedYear(year)}>
+              <Text style={[styles.tabText, selectedYear === year && { color: "#B78AFF" }]}>{year}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+        </View>
+
       </View>
+
 
       {/* Other Components */}
       <View style={styles.scores}>
       <ScrollView horizontal>
         <View style={styles.row2}>
           
-          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+          <LinearGradient colors={["#9987A9", "#E6E8FF"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
             <Text style={styles.cardType}>Aumento este mes</Text>
             <Text style={styles.cardBalance}>$ 1280</Text>
           </LinearGradient>
 
-          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+          <LinearGradient colors={["#9987A9", "#E6E8FF"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
             <Text style={styles.cardType}>% De sueldo ahorrado</Text>
             <Text style={styles.cardBalance}>41.5</Text>
           </LinearGradient>
 
-          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+          <LinearGradient colors={["#9987A9", "#E6E8FF"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
             <Text style={styles.cardType}>Retiros este mes</Text>
-            <Text style={styles.cardBalance}>$ 880</Text>
+            <Text style={styles.cardBalance}>$ {withdrawalsTotal}</Text>
           </LinearGradient>
 
           
-          <LinearGradient colors={["#9987A9", "#DED8E3"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
+          <LinearGradient colors={["#9987A9", "#E6E8FF"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cardItem}>
             <Text style={styles.cardType}>Retiros este mes</Text>
             <Text style={styles.cardBalance}>$ 880</Text>
           </LinearGradient>
@@ -203,13 +233,33 @@ export default function Score() {
         </ScrollView>
       </View>
 
-      <FlatList
-                data={savingData}
-                renderItem={renderSavings}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.transactionsList}
-                ListHeaderComponent={<Text style={styles.listHeader}>Transacciones este mes</Text>}
-              />
+          <FlatList
+      data={[...filteredData].reverse()} // Filter by selected month and show newest first
+      keyExtractor={(item, index) => index.toString()}
+      ListHeaderComponent={<Text style={styles.listHeader}>Transacciones este mes</Text>}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      ListEmptyComponent={
+        <View style={styles.transactionCard}>
+          <Text style={styles.listHeader}>Ningun moviento</Text>
+        </View>
+      }
+      renderItem={({ item }) => (
+        <View style={styles.transactionCard}>
+          <Text style={styles.transactionSubtitle}>
+            {new Date(item.date).toLocaleDateString()}
+          </Text>
+          <Text
+            style={[
+              styles.transactionAmount,
+              { color: item.amount < 0 ? "red" : "green" }, // Red for withdrawals, green for deposits
+            ]}
+          >
+            {item.amount < 0 ? `Withdrawal: -$${Math.abs(item.amount)}` : `Deposit: $${item.amount}`}
+          </Text>
+        </View>
+      )}
+      nestedScrollEnabled={true} // Allows scrolling inside another scrollable view
+    />
 
     </View>
   );
@@ -235,7 +285,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 40,
-    height:50,
+    height:45,
     paddingHorizontal: 16,
   },
   subtitle: {
@@ -268,7 +318,8 @@ cardItem: {
   justifyContent: 'center',
   alignItems: "center",
   width: 120,
-  margin: 2
+  margin: 2,
+
 },
 cardType: {
   fontSize: 14,
@@ -277,17 +328,20 @@ cardType: {
 },
 cardBalance: {
   fontSize: 19,
-  fontFamily: "Medium",
+  fontFamily: "Bold",
   color: '#000',
 },
-tabBarContainer: { alignItems: "center" },
-tabBar: { flexDirection: "row", backgroundColor: "#232B5D", borderRadius: 30, padding: 5, width: width * 0.9, alignItems: "center", justifyContent: "space-between", position: "relative" },
+tabBar: { flexDirection: "row", backgroundColor: "#232B5D", padding: 5, alignItems: "center", justifyContent: "space-between", position: "relative" },
 tabIndicator: { position: "absolute", backgroundColor: "white", width: (width * 0.9) / 7 - 10, height: "85%", borderRadius: 25, left: 5 },
-tabButton: { flex: 1, alignItems: "center", paddingVertical: 8 },
-tabText: { fontSize: 14, fontWeight: "bold", color: "#A8DADC" },
+tabText: { fontSize: 14, color: "#A8DADC",  fontFamily: "Medium", },
+tabBarContainer: { flexDirection: "column", alignItems: "center", },
+tabButton: { padding: 10, marginHorizontal: 5, backgroundColor: "#232B5D", borderRadius: 5,   borderColor: "#fff", borderWidth: 1},
+yearButton: { padding: 10, marginHorizontal: 5, backgroundColor: "#ddd", borderRadius: 5 },
+yearText: { fontSize: 14 },
 transactionsList: {
   paddingHorizontal: 16,
   paddingBottom: 16,
+  flex: 1,
 },
 listHeader: {
   fontSize: 16,
@@ -299,6 +353,7 @@ listHeader: {
 },
 transactionCard: {
   flexDirection: "row",
+  justifyContent: "space-between",
   alignItems: "center",
   padding: 10,
   backgroundColor: "#fff",
