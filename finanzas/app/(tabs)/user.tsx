@@ -4,8 +4,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { Avatar } from "@rneui/themed";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from "expo-router";
 
 export default function User() {
+
+  const router = useRouter();
+
   return (
         <View style={styles.container}>
                 <View style={styles.backcard}/>
@@ -32,20 +37,20 @@ export default function User() {
       
       {/* Action Buttons */}
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="wallet" size={24} color="#0C051D" />
-          <Text style={styles.actionText}>Registrar</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={() => router.push("pages/categories")}>
+        <MaterialIcons name="category" size={24} color="#273469" />
+          <Text style={styles.actionText}>Nueva categoria</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="send" size={24} color="#0C051D" />
+          <Ionicons name="send" size={24} color="#273469" />
           <Text style={styles.actionText}>Send</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="cash" size={24} color="#0C051D" />
+          <Ionicons name="cash" size={24} color="#273469" />
           <Text style={styles.actionText}>Request</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="time" size={24} color="#0C051D" />
+          <Ionicons name="time" size={24} color="#273469" />
           <Text style={styles.actionText}>History</Text>
         </TouchableOpacity>
       </View>
@@ -53,19 +58,19 @@ export default function User() {
             {/* Action Buttons */}
       <View style={[styles.actionsContainer, { marginTop: 10 }]}>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="wallet" size={24} color="#0C051D" />
+          <Ionicons name="wallet" size={24} color="#273469" />
           <Text style={styles.actionText}>Top Up</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="send" size={24} color="#0C051D" />
+          <Ionicons name="send" size={24} color="#273469" />
           <Text style={styles.actionText}>Send</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="cash" size={24} color="#0C051D" />
+          <Ionicons name="cash" size={24} color="#273469" />
           <Text style={styles.actionText}>Request</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="time" size={24} color="#0C051D" />
+          <Ionicons name="time" size={24} color="#273469" />
           <Text style={styles.actionText}>History</Text>
         </TouchableOpacity>
       </View>
@@ -152,16 +157,19 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   actionButton: {
-    backgroundColor: "#E6E8FF",
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#FAFAFF",
+    padding: 10,
+    borderRadius: 20,
     alignItems: "center",
     width: 80,
+    height: 90,
+    borderColor: "#DED8E3",
+    borderWidth: 2
   },
   actionText: {
     fontSize: 11,
-    fontFamily: "Regular",
+    fontFamily: "Medium",
     marginTop: 5,
-    color: "#0C051D",
+    color: "#273469",
   },
 });

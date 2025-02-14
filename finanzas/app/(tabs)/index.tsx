@@ -23,7 +23,7 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Skeleton } from '@rneui/themed';
 import { Link } from 'expo-router';
-import  { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 
 const CardsContext = createContext(null);
 
@@ -72,11 +72,10 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Background Card */}
       <View style={styles.backcard} />
-
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.row3}>
-          <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#9B7EDE"}} >ENERO 2025</Text>
+          <Text style={{ fontFamily: 'Medium', fontSize: 20, color: "#9B7EDE" }} >ENERO 2025</Text>
           <Avatar
             size={32}
             rounded
@@ -95,9 +94,9 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.expenseText}>$7,783.00</Text>
+          <Text style={styles.expenseText}>$12,200.00</Text>
           <View style={styles.divider} />
-          <Text style={styles.debtText}>- $1,187.40</Text>
+          <Text style={styles.debtText}>- $4,187.40</Text>
         </View>
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBar} />
@@ -113,7 +112,7 @@ export default function HomeScreen() {
         <View style={[styles.actionsContainer, { marginTop: 0 }]}>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="wallet" size={24} color="#273469" />
-            <Text style={styles.actionText}>+ Ahorro</Text>
+            <Text style={styles.actionText}>Nuevo Deposit</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="send" size={24} color="#273469" />
@@ -129,132 +128,132 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-{/* Cards Section */}
-<View style={styles.cardsSection}>
-  {loading ? (
-<View style={styles.card}>
-  <Skeleton animation="pulse" width={80} height={40} />
-  <Skeleton
-    LinearGradientComponent={LinearGradient}
-    animation="wave"
-    width={80}
-    height={40}
-  />
-</View>
-  ) : cards.length === 0 ? (
-    <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
-    <Feather name="plus" size={32} color="#000" />
-  </TouchableOpacity>
-  ) : (
-    <FlatList
-      data={[...cards, { id: 'add' }]}  // Include the "Add Card" as part of the data
-      keyExtractor={(item) => item.id.toString()}  // Ensure unique key extraction
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => {
-        if (item.id === 'add') {
-          // Add Card Button
-          return (
+        {/* Cards Section */}
+        <View style={styles.cardsSection}>
+          {loading ? (
+            <View style={styles.card}>
+              <Skeleton animation="pulse" width={80} height={40} />
+              <Skeleton
+                LinearGradientComponent={LinearGradient}
+                animation="wave"
+                width={80}
+                height={40}
+              />
+            </View>
+          ) : cards.length === 0 ? (
             <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
               <Feather name="plus" size={32} color="#000" />
             </TouchableOpacity>
-          );
-        }
-        // Determine the icon to show based on the issuer
-        let issuerIcon;
-        if (item.issuer === "mastercard") {
-          issuerIcon = <FontAwesome6 name="cc-mastercard" size={24} color="black" />;
-        } else if (item.issuer === "visa") {
-          issuerIcon = <FontAwesome6 name="cc-visa" size={24} color="black" />;
-        } else {
-          issuerIcon = <MaterialCommunityIcons name="credit-card" size={24} color="black" />;
-        }
+          ) : (
+            <FlatList
+              data={[...cards, { id: 'add' }]}  // Include the "Add Card" as part of the data
+              keyExtractor={(item) => item.id.toString()}  // Ensure unique key extraction
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => {
+                if (item.id === 'add') {
+                  // Add Card Button
+                  return (
+                    <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
+                      <Feather name="plus" size={32} color="#000" />
+                    </TouchableOpacity>
+                  );
+                }
+                // Determine the icon to show based on the issuer
+                let issuerIcon;
+                if (item.issuer === "mastercard") {
+                  issuerIcon = <FontAwesome6 name="cc-mastercard" size={24} color="black" />;
+                } else if (item.issuer === "visa") {
+                  issuerIcon = <FontAwesome6 name="cc-visa" size={24} color="black" />;
+                } else {
+                  issuerIcon = <MaterialCommunityIcons name="credit-card" size={24} color="black" />;
+                }
 
-        // Determine which chip or wallet icon to show based on card type
-        const cardIcon = (item.type === 3 || item.type === 4) ? (
-          <MaterialCommunityIcons name="wallet" size={28} color="black" />
-        ) : (
-          <MaterialCommunityIcons name="integrated-circuit-chip" size={28} color="black" />
-        );
+                // Determine which chip or wallet icon to show based on card type
+                const cardIcon = (item.type === 3 || item.type === 4) ? (
+                  <MaterialCommunityIcons name="wallet" size={28} color="black" />
+                ) : (
+                  <MaterialCommunityIcons name="integrated-circuit-chip" size={28} color="black" />
+                );
 
-        return (
-            <Link
-              href={{
-                pathname: '/pages/card/[id]',  // Correct relative path
-                params: { id: item.id },       // Pass the actual card id
+                return (
+                  <Link
+                    href={{
+                      pathname: '/pages/card/[id]',  // Correct relative path
+                      params: { id: item.id },       // Pass the actual card id
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#fff", item.color, "#A8DADC"]}  // Colors as an array
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1., y: 1.2 }}
+                      style={styles.cardItem}
+                    >
+                      <View style={styles.row3}>
+                        <Text style={styles.cardType}>{item.name}</Text>
+                        {cardIcon}  {/* Show the chip or wallet icon */}
+                      </View>
+                      <Text style={styles.cardBalance}>${item.balance}</Text>
+                      <Text style={styles.cardAccount}>{item.bank}</Text>
+                      {issuerIcon}  {/* Show the issuer's card icon */}
+                    </LinearGradient>
+                  </Link>
+                );
               }}
-            >
-          <LinearGradient                  
-            colors={["#fff",  item.color, "#A8DADC"]}  // Colors as an array
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1., y: 1.2 }}
-            style={styles.cardItem}
-          >
-            <View style={styles.row3}>
-            <Text style={styles.cardType}>{item.name}</Text>
-              {cardIcon}  {/* Show the chip or wallet icon */}
-            </View>
-            <Text style={styles.cardBalance}>${item.balance}</Text>
-            <Text style={styles.cardAccount}>{item.bank}</Text>
-            {issuerIcon}  {/* Show the issuer's card icon */}
-          </LinearGradient>
-          </Link>
-        );
-      }}
-    />
-  )}
-</View>
+            />
+          )}
+        </View>
 
-       {/* Info Section */}
-       <View style={styles.infoSection}>
-        <View style={styles.card}>
-          <View style={styles.leftSection}>
-            <View style={styles.circularProgress}>
-              <Image
-                source={require('../../assets/images/placeholder.png')}
-                style={styles.progressImage}
-              />
+        {/* Info Section */}
+        <View style={styles.infoSection}>
+          <View style={styles.card}>
+            <View style={styles.leftSection}>
+              <View style={styles.circularProgress}>
+                <Image
+                  source={require('../../assets/images/placeholder.png')}
+                  style={styles.progressImage}
+                />
+              </View>
+              <Text style={styles.totalText}>$ 16,000.0</Text>
             </View>
-            <Text style={styles.totalText}>$ 16,000.0</Text>
-          </View>
 
-          <View style={styles.divider2} />
+            <View style={styles.divider2} />
 
-          <View style={styles.rightSection}>
-            <View style={styles.infoRow}>
-              <Feather name="arrow-up-circle" size={32} color="#052224" />
-              <Text style={styles.infoText}>Ahorro este mes</Text>
+            <View style={styles.rightSection}>
+              <View style={styles.infoRow}>
+                <Feather name="arrow-up-circle" size={32} color="#052224" />
+                <Text style={styles.infoText}>Ahorro este mes</Text>
+              </View>
+              <Text style={styles.infoValue}>$ 0,000.00</Text>
+
+              <View style={styles.infoRow}>
+                <Feather name="arrow-down-circle" size={32} color="#052224" />
+                <Text style={styles.infoText}>Retiros este mes</Text>
+              </View>
+              <Text style={styles.infoValueNegative}>- $ 0,000.00</Text>
             </View>
-            <Text style={styles.infoValue}>$ 0,000.00</Text>
-
-            <View style={styles.infoRow}>
-              <Feather name="arrow-down-circle" size={32} color="#052224" />
-              <Text style={styles.infoText}>Retiros este mes</Text>
-            </View>
-            <Text style={styles.infoValueNegative}>- $ 0,000.00</Text>
           </View>
         </View>
-      </View>
 
-      <TouchableOpacity
-        onPress={() => router.push("pages/score")} // Navigate to the "score" screen
-      >
-      <View style={styles.footer}>
-      {/* Blurred Background Letters */}
-        <BlurView intensity={30} tint="default"  style={styles.blurredTextContainer}>
-          <Text style={styles.blurredText}>BB</Text>
-        </BlurView>
+        <TouchableOpacity
+          onPress={() => router.push("pages/score")} // Navigate to the "score" screen
+        >
+          <View style={styles.footer}>
+            {/* Blurred Background Letters */}
+            <BlurView intensity={30} tint="default" style={styles.blurredTextContainer}>
+              <Text style={styles.blurredText}>BB</Text>
+            </BlurView>
 
-        {/* Score and Description */}
-        <View style={[styles.row, { flexDirection: "row" }]}>
-          <Text style={styles.footerText}>0.780</Text>
-          <Text style={styles.footerText}>AA</Text>
-        </View>
-        <Text style={styles.footerDescription}>
-          Consider reviewing expenses for possible reductions. Avoid unnecessary large purchases or debt accumulation. Focus on maintaining a stable balance between savings and spending.
-        </Text>
-    </View>
-    </TouchableOpacity>
+            {/* Score and Description */}
+            <View style={[styles.row, { flexDirection: "row" }]}>
+              <Text style={styles.footerText}>0.780</Text>
+              <Text style={styles.footerText}>AA</Text>
+            </View>
+            <Text style={styles.footerDescription}>
+              Consider reviewing expenses for possible reductions. Avoid unnecessary large purchases or debt accumulation. Focus on maintaining a stable balance between savings and spending.
+            </Text>
+          </View>
+        </TouchableOpacity>
 
         <View style={styles.bottomInfoSection}>
           <View style={styles.bottomInfoCard}>
@@ -271,7 +270,7 @@ export default function HomeScreen() {
             <Text style={styles.bottomInfoTitle}>Spare siguiente pago</Text>
             <Text style={styles.bottomInfoValue}>$900.0</Text>
           </View>
-      </View>
+        </View>
 
       </ScrollView>
 
@@ -310,7 +309,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#000',
-    fontFamily: "Medium", 
+    fontFamily: "Medium",
   },
   expenseSection: {
     marginBottom: 25,
@@ -340,15 +339,15 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     height: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#D72638',
     borderRadius: 20,
     overflow: 'hidden',
     marginVertical: 15,
   },
   progressBar: {
-    width: '70%',
+    width: '68%',
     height: '100%',
-    backgroundColor: '#9B7EDE',
+    backgroundColor: '#a86efa',
   },
   percentageText: {
     fontSize: 14,
@@ -362,10 +361,11 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     backgroundColor: "#FAFAFF",
-    padding: 15,
+    padding: 10,
     borderRadius: 20,
     alignItems: "center",
     width: 80,
+    height: 90,
     borderColor: "#DED8E3",
     borderWidth: 2
   },
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   },
   cardsSection: {
     marginVertical: 15,
-    
+
   },
   cardItem: {
     width: cardWidth,

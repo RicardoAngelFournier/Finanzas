@@ -47,6 +47,7 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen name="pages/newcard" options={{ headerShown: false }} />
+      <Stack.Screen name="pages/categories" options={{ headerShown: false }} />
       <Stack.Screen name="pages/card/[id]" options={{ headerShown: false }} />
               <Stack.Screen
         name="pages/infoscore"
