@@ -24,6 +24,7 @@ import { useFocusEffect } from 'expo-router';
 import { Skeleton } from '@rneui/themed';
 import { Link } from 'expo-router';
 import { createContext, useContext, useEffect } from 'react';
+import { PieChart } from "react-native-gifted-charts";
 
 const CardsContext = createContext(null);
 
@@ -38,6 +39,11 @@ export default function HomeScreen() {
     color: string;
     balance?: number;  // Optional field based on your API response
   }[]>([]);
+
+    const pieData = [
+      {value: 70, color: '#a86efa'},
+      {value: 30, color: 'black'}
+  ];
 
   const [loading, setLoading] = useState(true); // Add loading state
 
@@ -208,12 +214,15 @@ export default function HomeScreen() {
         <View style={styles.infoSection}>
           <View style={styles.card}>
             <View style={styles.leftSection}>
-              <View style={styles.circularProgress}>
-                <Image
-                  source={require('../../assets/images/placeholder.png')}
-                  style={styles.progressImage}
-                />
-              </View>
+              <PieChart
+                donut
+                radius={35}
+                innerRadius={20}
+                data={pieData}
+                centerLabelComponent={() => {
+                return <Text style={{fontSize: 14, fontFamily: "Bold"}}>22%</Text>;
+                }}
+            />
               <Text style={styles.totalText}>$ 16,000.0</Text>
             </View>
 
@@ -386,7 +395,7 @@ const styles = StyleSheet.create({
     width: width - 32,
     backgroundColor: '#FAFAFF',
     borderRadius: 20,
-    padding: 16,
+    padding: 14,
     borderColor: "#DED8E3",
     borderWidth: 2
   },
@@ -538,8 +547,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#DED8E3',
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     marginTop: 20,
     marginBottom: 16,
   },
