@@ -41,8 +41,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         displayFullDays
         headerButtonColor={"#9B7EDE"}
         selectedTextStyle={{
-          fontWeight: 'bold',
           color: "#fff",
+          fontFamily:"Bold"
         }}
       />
     </View>
@@ -54,11 +54,11 @@ export default CustomDatePicker;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#FAFAFF',
   },
   body: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#FAFAFF',
     alignItems: 'center',
   },
   titleContainer: {
@@ -88,13 +88,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   datePicker: {
-    backgroundColor: '#DED8E3',
+    backgroundColor: '#fff',
     padding: 15,
     borderRadius: 20,
     shadowRadius: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 0 },
+    borderColor: "#DED8E3",
+    borderWidth: 2
   },
   footer: {
     paddingHorizontal: 5,

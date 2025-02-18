@@ -288,7 +288,7 @@ export default function CardScreen() {
           size="large"
         >
           <SpeedDial.Action
-            icon={{ name: 'money-check-dollar', color: '#fff', type: "font-awesome"}}
+            icon={{ name: 'donate', color: '#fff', type: "font-awesome-5"}}
             title="Nueva Transaccion"
             onPress={() => console.log('Add Something')}
             color="#C0B3DE"
@@ -329,8 +329,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: height * 0.35,
     backgroundColor: "#E6E8FF",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderRadius: 40
   },
   header: {
     marginTop: 20,

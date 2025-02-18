@@ -140,8 +140,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: height * 0.35,
     backgroundColor: '#EBCBE3',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderRadius: 40
   },
   header: {
     marginTop: 40,

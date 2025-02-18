@@ -17,6 +17,7 @@ import { BlurView } from 'expo-blur';
 import { useRouter } from "expo-router";
 import { Avatar } from '@rneui/themed';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from "@/database/supabaseClient";
 import { useState, useCallback } from 'react';
@@ -118,14 +119,14 @@ export default function HomeScreen() {
         <View style={[styles.actionsContainer, { marginTop: 0 }]}>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons name="wallet" size={24} color="#273469" />
-            <Text style={styles.actionText}>Nuevo Deposit</Text>
+            <Text style={styles.actionText}>Nuev</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="send" size={24} color="#273469" />
-            <Text style={styles.actionText}>Send</Text>
+          <MaterialCommunityIcons name="cash-plus" size={26} color="#273469" />
+            <Text style={styles.actionText}>Ingreso</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="cash" size={24} color="#273469" />
+          <FontAwesome5 name="donate" size={24} color="#273469" />
             <Text style={styles.actionText}>Request</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={() => router.push("pages/cardstest")}>
@@ -303,8 +304,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: height * 0.35,
     backgroundColor: '#E6E8FF',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderRadius: 40
   },
   header: {
     marginTop: 40,

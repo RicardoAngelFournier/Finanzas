@@ -6,6 +6,8 @@ import { LineChart } from "react-native-gifted-charts";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/database/supabaseClient"; //query with this
 import { useEffect } from "react";
+import { useRouter } from "expo-router";
+
 
 export default function Score() {
   const currentMonth = new Date().getMonth();
@@ -23,6 +25,9 @@ export default function Score() {
   const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => currentYear - i); // Only past and current years
   const salary = 11800; 
+
+  const router = useRouter(); //navigations
+
 
   useEffect(() => {
     fetchSavingsData();
@@ -123,14 +128,16 @@ export default function Score() {
     <View style={styles.container}>
       <View style={styles.backcard} />
 
-      <TouchableOpacity onPress={() => console.log("Navigate to details")} activeOpacity={0.7}>
+      <TouchableOpacity onPress={() => router.push("pages/newsaving")} activeOpacity={0.7}>
         <View style={styles.header}>
           <Text style={styles.subtitle}>Ahorro:</Text>
           <View style={styles.row2}>
             <Text style={{ fontFamily: "ExtraBold", fontSize: 38, color: "#ffffff" }}>
             $ {totalSavings} MXN
             </Text>
-
+              <View style={{ marginRight: 10 }}>
+                  <FontAwesome6 name="circle-chevron-right" size={24} color="white" />
+              </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -139,7 +146,7 @@ export default function Score() {
       <View style={{ marginTop: 15 }}>
         <LineChart
           yAxisOffset={1}
-          height={height * 0.26}
+          height={height * 0.24}
           width={width}
           areaChart
           animateOnDataChange
@@ -173,10 +180,9 @@ export default function Score() {
             pointerLabelHeight: 120,
             pointerLabelComponent: items => (
               <View style={{ height: 90, width: 100, backgroundColor: '#0C051D', borderRadius: 4, justifyContent: 'center', paddingLeft: 16 }}>
-                <Text style={{ color: 'lightgray', fontSize: 12 }}>Actual</Text>
-                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>{items[0].total}</Text>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>{items[0].amount}</Text>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>{items[0].date}</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>Total {items[0].total}</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12  }}>Ingreso {items[0].amount}</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12  }}>Fecha {items[0].date}</Text>
               </View>
             ),
           }}
@@ -290,8 +296,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: height * 0.55,
     backgroundColor: "#0C051D",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderRadius: 40
   },
   header: {
     marginTop: 40,
