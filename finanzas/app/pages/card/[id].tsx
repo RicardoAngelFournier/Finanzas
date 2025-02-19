@@ -290,7 +290,7 @@ export default function CardScreen() {
           <SpeedDial.Action
             icon={{ name: 'donate', color: '#fff', type: "font-awesome-5"}}
             title="Nueva Transaccion"
-            onPress={() => console.log('Add Something')}
+            onPress={(id: cardData.id ) => router.push("/pages/new/newtransaction")}
             color="#C0B3DE"
             size="large"
           />

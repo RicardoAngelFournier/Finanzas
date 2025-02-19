@@ -46,10 +46,11 @@ export default function RootLayout() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="pages/newcard" options={{ headerShown: false }} />
+      <Stack.Screen name="pages/new/newcard" options={{ headerShown: false }} />
       <Stack.Screen name="pages/categories" options={{ headerShown: false }} />
       <Stack.Screen name="pages/card/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="pages/newsaving" options={{ headerShown: false }} />
+      <Stack.Screen name="pages/new/newsaving" options={{ headerShown: false }} />
+      <Stack.Screen name="pages/new/newtransaction" options={{ headerShown: false }} />
               <Stack.Screen
         name="pages/infoscore"
         options={{

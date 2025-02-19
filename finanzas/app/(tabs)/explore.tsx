@@ -129,7 +129,7 @@ export default function Score() {
     <View style={styles.container}>
       <View style={styles.backcard} />
 
-      <TouchableOpacity onPress={() => router.push("pages/newsaving")} activeOpacity={0.7}>
+      <TouchableOpacity onPress={() => router.push("/pages/new/newsaving")} activeOpacity={0.7}>
         <View style={styles.header}>
           <Text style={styles.subtitle}>Ahorro:</Text>
           <View style={styles.row2}>

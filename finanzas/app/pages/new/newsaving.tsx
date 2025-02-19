@@ -146,8 +146,8 @@ export default function newsaving() {
             >
                 <View style={styles.cardTop}>
                     <View>
-                        <Text style={styles.totalBalanceText}>Ahorro:</Text>
-                        <Text style={styles.balanceAmount}>${savingsTotal}</Text>
+                        <Text style={styles.totalBalanceText}>Ahorro Actual:</Text>
+                        <Text style={styles.balanceAmount}>${savingsTotal}  + {amount} </Text>
                     </View>
                     <View>
                         <FontAwesome6 name="circle-dollar-to-slot" size={30} color="black" />

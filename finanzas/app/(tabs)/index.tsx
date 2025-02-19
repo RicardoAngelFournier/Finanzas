@@ -148,7 +148,7 @@ export default function HomeScreen() {
               />
             </View>
           ) : cards.length === 0 ? (
-            <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
+            <TouchableOpacity style={styles.addCard} onPress={() => router.push("/pages/new/newcard")}>
               <Feather name="plus" size={32} color="#000" />
             </TouchableOpacity>
           ) : (
@@ -161,7 +161,7 @@ export default function HomeScreen() {
                 if (item.id === 'add') {
                   // Add Card Button
                   return (
-                    <TouchableOpacity style={styles.addCard} onPress={() => router.push("pages/newcard")}>
+                    <TouchableOpacity style={styles.addCard} onPress={() => router.push("/pages/new/newcard")}>
                       <Feather name="plus" size={32} color="#000" />
                     </TouchableOpacity>
                   );
