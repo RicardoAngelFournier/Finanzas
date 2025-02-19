@@ -85,8 +85,8 @@ export default function Score() {
             <View style={styles.header}>
                 <Text style={styles.subtitle}>Score Actual:</Text>
                 <View style={styles.row2}>
-                    <Text style={{ fontFamily: "Bold", fontSize: 38, color: "#fff" }}>0.853</Text>
-                    <Text style={{ fontFamily: "Black", fontSize: 38, color: "#fff" }}>BBB</Text>
+                    <Text style={{ fontFamily: "Bold", fontSize: 40, color: "#fff" }}>0.853</Text>
+                    <Text style={{ fontFamily: "Black", fontSize: 40, color: "#fff" }}>BBB</Text>
                 </View>
                 <View style={styles.row2}>
                     <Text style={styles.subtitle2}>Siguiente registro en: 3 dias 15 horas 26 minutos</Text>

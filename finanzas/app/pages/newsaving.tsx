@@ -10,6 +10,7 @@ import { Divider } from '@rneui/themed';
 import { supabase } from '@/database/supabaseClient';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import { Skeleton } from '@rneui/themed';
 
 export default function newsaving() {
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -18,6 +19,9 @@ export default function newsaving() {
     const [selectedCard, setSelectedCard] = useState(null);
     const [savingsTotal, setSavingsTotal] = useState(0);
     const [error, setError] = useState('');
+    const [remainingBalance, setRemainingBalance] = useState(null);
+    const [loading, setLoading] = useState(true); // Add loading state
+    
     const amountInputRef = useRef(null); // Reference for shaking the inp
 
     useEffect(() => {
@@ -26,11 +30,13 @@ export default function newsaving() {
     }, []);
 
     const fetchCards = async () => {
+        setLoading(true); // Set loading to true when starting to load cards
         const { data, error } = await supabase.from('cards').select('*');
         if (error) {
             console.error('Error fetching cards:', error);
         } else {
             setCards(data);
+            setLoading(false); // Set loading to true when starting to load cards
         }
     };
 
@@ -45,9 +51,8 @@ export default function newsaving() {
 
     const handleTransfer = async () => {
         setError(""); // Clear previous errors
-
+    
         if (!selectedCard || !amount) {
-            alert("Seleccione una cuenta y una cantidad válida.");
             setError("Seleccione una cuenta y una cantidad válida.");
             amountInputRef.current?.shake();
             return;
@@ -55,9 +60,20 @@ export default function newsaving() {
     
         const numericAmount = parseFloat(amount);
         if (isNaN(numericAmount) || numericAmount <= 0) {
-            alert("Ingrese un monto válido.");
             setError("Ingrese un monto válido.");
             amountInputRef.current?.shake();    
+            return;
+        }
+    
+        if (selectedIndex === 0 && numericAmount > selectedCard.balance) {
+            setError("Saldo insuficiente en la cuenta seleccionada.");
+            amountInputRef.current?.shake();
+            return;
+        }
+    
+        if (selectedIndex === 1 && numericAmount > savingsTotal) {
+            setError("No hay suficiente saldo en ahorros.");
+            amountInputRef.current?.shake();
             return;
         }
     
@@ -66,39 +82,24 @@ export default function newsaving() {
         try {
             if (selectedIndex === 0) {
                 // Depositing into savings
-                const { data: savingData, error: savingError } = await supabase
+                await supabase
                     .from('savings')
                     .insert([{ date: newDate, amount: numericAmount, total: savingsTotal + numericAmount }]);
     
-                if (savingError) throw savingError;
-    
-                const { data: updateCard, error: cardError } = await supabase
+                await supabase
                     .from('cards')
                     .update({ balance: selectedCard.balance - numericAmount })
                     .eq('id', selectedCard.id);
-    
-                if (cardError) throw cardError;
             } else {
                 // Withdrawing from savings
-                if (numericAmount > savingsTotal) {
-                    alert("No hay suficiente saldo en ahorros.");
-                    setError("No hay suficiente saldo en ahorros.");
-                    amountInputRef.current?.shake();
-                    return;
-                }
-    
-                const { data: savingData, error: savingError } = await supabase
+                await supabase
                     .from('savings')
                     .insert([{ date: newDate, amount: -numericAmount, total: savingsTotal - numericAmount }]);
     
-                if (savingError) throw savingError;
-    
-                const { data: updateCard, error: cardError } = await supabase
+                await supabase
                     .from('cards')
                     .update({ balance: selectedCard.balance + numericAmount })
                     .eq('id', selectedCard.id);
-    
-                if (cardError) throw cardError;
             }
     
             alert("Transacción realizada con éxito");
@@ -107,10 +108,26 @@ export default function newsaving() {
             setAmount('');
         } catch (error) {
             console.error("Error updating data:", error);
-            alert("Hubo un error en la transacción.");
             setError("Hubo un error en la transacción.");
             amountInputRef.current?.shake();
-
+        }
+    };
+    
+    const handleAmountChange = (value) => {
+        setAmount(value);
+    
+        const numericAmount = parseFloat(value);
+        if (!selectedCard || isNaN(numericAmount)) {
+            setRemainingBalance(null);
+            return;
+        }
+    
+        if (selectedIndex === 0) {
+            // Depositing into savings (subtracting from card balance)
+            setRemainingBalance(selectedCard.balance - numericAmount);
+        } else {
+            // Withdrawing from savings (card balance increases)
+            setRemainingBalance(selectedCard.balance + numericAmount);
         }
     };
 
@@ -143,7 +160,13 @@ export default function newsaving() {
                 </View>
                 <View style={styles.row}>
                     <View>
-                        <Text style={styles.balanceAmount}>$ </Text>
+                    <Text style={[
+                            styles.balanceAmount, 
+                            remainingBalance !== null && remainingBalance < 0 ? { color: 'red' } : {}
+                        ]}
+                    >
+                        {remainingBalance !== null ? `$${remainingBalance.toFixed(2)}` : '--'}
+                    </Text>
                     </View>
                 </View>
             </LinearGradient>
@@ -169,7 +192,7 @@ export default function newsaving() {
                 ref={amountInputRef}
                 keyboardType="numeric"
                 value={amount}
-                onChangeText={setAmount}
+                onChangeText={handleAmountChange}
                 placeholderTextColor={"gray"}
                 inputStyle={{ fontFamily: "Bold", fontSize: 32, color: "#957FEF" }}
                 leftIcon={<FontAwesome6 name="dollar-sign" size={30} color="gray" />}
@@ -179,7 +202,15 @@ export default function newsaving() {
 
             <View style={styles.card}>
                 <Text style={styles.subtitle}>Cuenta de Origen</Text>
-                <Divider color='black' width={1} orientation="horizontal"></Divider>
+                {loading ? (
+            <View style={styles.card}>
+              <Skeleton
+                LinearGradientComponent={LinearGradient}
+                animation="wave"
+                style={styles.cardItem}
+              />
+            </View>
+            ) : (
 
                 <View style={styles.row3}>
                 <FlatList
@@ -205,10 +236,12 @@ export default function newsaving() {
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
+                
             />
             </View>
+            )}
             </View>
-
+        
             <TouchableOpacity onPress={handleTransfer} style={styles.transferButton}>
                 <Text style={styles.transferButtonText}>Transferir</Text>
             </TouchableOpacity>

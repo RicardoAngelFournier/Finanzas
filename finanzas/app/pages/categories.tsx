@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet, Modal, Dimensions } from 'react-native';
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider } from 'reanimated-color-picker';
 import { supabase } from '@/database/supabaseClient';
-import { Dimensions } from 'react-native';
 
 interface Category {
   id: number;
@@ -18,6 +17,7 @@ const CategoriesScreen: React.FC = () => {
   const [color, setColor] = useState('#000000');
   const [categories, setCategories] = useState<Category[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showColor, setShowColor] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -39,9 +39,7 @@ const CategoriesScreen: React.FC = () => {
       return;
     }
 
-    const { error } = await supabase
-      .from('category')
-      .insert([{ name, emoji, color }]);
+    const { error } = await supabase.from('category').insert([{ name, emoji, color }]);
 
     if (error) {
       console.error(error);
@@ -51,7 +49,7 @@ const CategoriesScreen: React.FC = () => {
       setName('');
       setEmoji('');
       setColor('#000000');
-      fetchCategories(); // Refresh the list
+      fetchCategories();
     }
   };
 
@@ -62,76 +60,100 @@ const CategoriesScreen: React.FC = () => {
     </View>
   );
 
+  const onSelectColor = ({ hex }) => setColor(hex);
+
   return (
     <View style={styles.container}>
-        <View style={styles.backcard} />
-        <View style={styles.header}>
-      <Text style={styles.title}>Create New Category</Text>
-      <TextInput
-        placeholder="Category Name"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      <TouchableOpacity onPress={() => setShowEmojiPicker(!showEmojiPicker)} style={styles.emojiButton}>
-        <Text style={styles.emojiButtonText}>{emoji || 'Pick an Emoji'}</Text>
-      </TouchableOpacity>
+      <View style={styles.backcard} />
+      <View style={styles.header}>
+        <Text style={styles.title}>Crear nueva categoría</Text>
+        <TextInput
+          placeholder="Nombre de la categoría"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
+        <TouchableOpacity onPress={() => setShowEmojiPicker(true)} style={styles.emojiButton}>
+          <Text style={styles.subtitle}>{emoji || 'Escoger un emoji'}</Text>
+        </TouchableOpacity>
       </View>
 
-      {showEmojiPicker && (
-        <View style={{ height: 500, backgroundColor: "#fff"}}>
-            <EmojiSelector
+      {/* Emoji Picker Modal */}
+      <Modal visible={showEmojiPicker} animationType='slide'>
+        <View style={styles.modalContainer}>
+          <EmojiSelector
             onEmojiSelected={(selectedEmoji) => {
-                setEmoji(selectedEmoji);
-                setShowEmojiPicker(false);
+              setEmoji(selectedEmoji);
+              setShowEmojiPicker(false);
             }}
-            category={Categories.symbols} // Optional: Limit to specific categories to reduce load
-            />
+            category={Categories.symbols}
+          />
+          <TouchableOpacity onPress={() => setShowEmojiPicker(false)} style={styles.modalCloseButton}>
+            <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+          </TouchableOpacity>
         </View>
-        )}
+      </Modal>
 
-      <Text style={styles.label}>Pick a Color:</Text>
-      <ColorPicker
-        value={color}
-        onComplete={(color) => setColor(color.hex)}
-        style={{ height: 50, width: '100%' }}
-      />
-      <TouchableOpacity onPress={handleSaveCategory} style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Save Category</Text>
+      {/* Color Picker Button */}
+      <TouchableOpacity onPress={() => setShowColor(true)} style={[styles.colorButton, { backgroundColor: color }]}>
+        <Text style={styles.colorButtonText}>Escoger color</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>Existing Categories</Text>
-      <FlatList
-        data={categories}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderCategory}
-      />
+
+      {/* Color Picker Modal */}
+      <Modal visible={showColor} animationType='slide'>
+        <View style={styles.modalContainer}>
+          <ColorPicker value={color} onComplete={onSelectColor}>
+            <Preview />
+            <Panel1 />
+            <HueSlider />
+            <OpacitySlider />
+            <Swatches />
+          </ColorPicker>
+          <TouchableOpacity onPress={() => setShowColor(false)} style={styles.modalCloseButton}>
+            <Text style={styles.modalCloseButtonText}>Ok</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Save Button */}
+      <TouchableOpacity onPress={handleSaveCategory} style={styles.saveButton}>
+        <Text style={styles.saveButtonText}>Guardar Categoría</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Categorías existentes</Text>
+      <View style={styles.listContainer}>
+        <FlatList
+          scrollEnabled
+          data={categories}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderCategory}
+        />
+      </View>
     </View>
   );
 };
+
 const { width, height } = Dimensions.get('window');
 
-export default CategoriesScreen;
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingHorizontal: 16,
-        },
-        backcard: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: height * 0.35,
-            backgroundColor: '#E6E8FF',
-            borderBottomLeftRadius: 24,
-            borderBottomRightRadius: 24,
-          },
-          header: {
-            marginTop: 40,
-            color: '#000',
-          },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+  },
+  backcard: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.35,
+    backgroundColor: '#E6E8FF',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
+  header: {
+    marginTop: 40,
+  },
   title: {
     fontSize: 21,
     fontFamily: 'Medium',
@@ -141,33 +163,47 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 8,
+    padding: 12,
     marginBottom: 16,
+    fontFamily: 'Regular',
   },
   emojiButton: {
     backgroundColor: '#9B7EDE',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 16,
   },
-  emojiButtonText: {
+  subtitle: {
     fontSize: 16,
+    color: '#fff',
+    fontFamily: 'Medium',
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  saveButton: {
-    backgroundColor: '#007BFF',
+  colorButton: {
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 16,
+  },
+  colorButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Medium',
+  },
+  saveButton: {
+    backgroundColor: '#28a745',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Bold',
+  },
+  listContainer: {
+    marginTop: 10,
+    flex: 1,
   },
   categoryItem: {
     flexDirection: 'row',
@@ -182,5 +218,25 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
+    fontFamily: 'Regular',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 16,
+  },
+  modalCloseButton: {
+    marginTop: 16,
+    padding: 10,
+    backgroundColor: '#007BFF',
+    borderRadius: 8,
+  },
+  modalCloseButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
+
+export default CategoriesScreen;

@@ -77,23 +77,24 @@ export default function Score() {
   const calculateMonthlySavings = (data, year, month) => {
     if (data.length === 0) return 0;
   
-    // Sort transactions by date (newest first)
-    const sortedData = [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
-    // Get last entry of the selected month
-    const currentMonthEntry = sortedData.find((t) => {
+    // Filter transactions for the selected month & year
+    const filteredTransactions = data.filter((t) => {
       const date = new Date(t.date);
       return date.getFullYear() === year && date.getMonth() === month;
-    })?.total ?? 0;
+    });
   
-    // Get last entry of the previous month
-    const previousMonthEntry = sortedData.find((t) => {
-      const date = new Date(t.date);
-      return date.getFullYear() === year && date.getMonth() === month - 1;
-    })?.total ?? 0;
+    // Sum all deposits (positive amounts)
+    const depositsTotal = filteredTransactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
   
-    // Calculate the difference correctly
-    return currentMonthEntry - previousMonthEntry;
+    // Sum all withdrawals (negative amounts)
+    const withdrawalsTotal = filteredTransactions
+      .filter((t) => t.amount < 0)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  
+    // Calculate net savings for the month
+    return depositsTotal - withdrawalsTotal;
   };
   
   const formatDate = (dateString) => {
