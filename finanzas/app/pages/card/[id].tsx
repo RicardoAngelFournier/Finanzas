@@ -290,23 +290,20 @@ export default function CardScreen() {
           <SpeedDial.Action
             icon={{ name: 'donate', color: '#fff', type: "font-awesome-5"}}
             title="Nueva Transaccion"
-            onPress={(id: cardData.id ) => router.push("/pages/new/newtransaction")}
+            onPress={() => router.push({ pathname: "/pages/new/newtransaction", params: { id: cardData.id } })}
             color="#C0B3DE"
-            size="large"
           />
           <SpeedDial.Action
             icon={{ name: 'cash-plus', color: '#fff', type: "material-community" }}
-            title="Ingreso"
+            title="Editar Tarjeta"
             onPress={() => console.log('Delete Something')}
             color="#C0B3DE"
-            size="large"
           />
           <SpeedDial.Action
             icon={{ name: 'add', color: '#fff', }}
             title="Retiro"
             onPress={() => console.log('Delete wwd')}
             color="#C0B3DE"
-            size="large"
           />
       </SpeedDial>
 
